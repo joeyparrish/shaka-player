@@ -989,7 +989,7 @@ describe('Playhead', () => {
           jasmine.clock().tick(500);
 
           expect(onEvent).toHaveBeenCalledTimes(data.expectEvent ? 1 : 0);
-          expect(video.currentTime).toBe(data.expectedEndTime);
+          expect(video.currentTime).toBeCloseTo(data.expectedEndTime);
         });
       }
     });  // when playing
@@ -1268,7 +1268,7 @@ describe('Playhead', () => {
       jasmine.clock().tick(500);
 
       expect(seekCount).toBe(1);
-      expect(currentTime).toBe(10);
+      expect(currentTime).toBeCloseTo(10);
     });
 
     it('doesn\'t gap jump if paused', () => {
@@ -1315,7 +1315,7 @@ describe('Playhead', () => {
       jasmine.clock().tick(500);
 
       // There SHOULD have been a gap jump.
-      expect(video.currentTime).toBe(10);
+      expect(video.currentTime).toBeCloseTo(10);
     });
 
     /**
@@ -1366,7 +1366,7 @@ describe('Playhead', () => {
 
           // Now StreamingEngine will buffer the new content and tell playhead
           // about it.
-          expect(video.currentTime).toBe(data.seekTo);
+          expect(video.currentTime).toBeCloseTo(data.seekTo);
           video.buffered = createFakeBuffered(data.newBuffered);
           video.readyState = calculateReadyState(data.newBuffered, data.seekTo);
           if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
@@ -1377,7 +1377,7 @@ describe('Playhead', () => {
         }
 
         expect(onEvent).toHaveBeenCalledTimes(data.expectEvent ? 1 : 0);
-        expect(video.currentTime).toBe(data.expectedEndTime);
+        expect(video.currentTime).toBeCloseTo(data.expectedEndTime);
       });
     }
 
