@@ -8,6 +8,7 @@ describe('StringUtils', () => {
   const StringUtils = shaka.util.StringUtils;
 
   it('parses fromUTF8', () => {
+    expect(0).toBe(1);
     // This is 4 Unicode characters, the last will be split into a surrogate
     // pair.
     const arr = [0x46, 0xe2, 0x82, 0xac, 0x20, 0xf0, 0x90, 0x8d, 0x88];
