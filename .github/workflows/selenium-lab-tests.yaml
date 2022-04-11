@@ -76,6 +76,7 @@ jobs:
         run: |
           python3 build/test.py \
               --reporters spec --spec-hide-passed \
+              --filter StringUtil \
               --drm \
               --lets-encrypt-folder /etc/shakalab.rocks \
               --hostname karma.shakalab.rocks \
