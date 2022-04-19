@@ -16,4 +16,36 @@
      this.pendingCount--
  
      if (!this.pendingCount) {
-
+--- node_modules/karma/lib/server.js.orig       2022-04-19 09:34:32.000000000 -0700
++++ node_modules/karma/lib/server.js    2022-04-19 09:34:35.000000000 -0700
+@@ -347,12 +347,14 @@
+ 
+     if (config.singleRun) {
+       this.on('browser_restart_failure', (completedBrowser) => {
++console.log('browser_restart_failure');
+         singleRunDoneBrowsers[completedBrowser.id] = true
+         emitRunCompleteIfAllBrowsersDone()
+       })
+ 
+       // This is the normal exit trigger.
+       this.on('browser_complete_with_no_more_retries', function (completedBrowser) {
++console.log('browser_complete_with_no_more_retries');
+         singleRunDoneBrowsers[completedBrowser.id] = true
+ 
+         if (launcher.kill(completedBrowser.id)) {
+@@ -363,6 +365,7 @@
+       })
+ 
+       this.on('browser_process_failure', (browserLauncher) => {
++console.log('browser_process_failure');
+         singleRunDoneBrowsers[browserLauncher.id] = true
+         singleRunBrowserNotCaptured = true
+ 
+@@ -370,6 +373,7 @@
+       })
+ 
+       this.on('run_complete', (browsers, results) => {
++console.log('run_complete, exiting');
+         this.log.debug('Run complete, exiting.')
+         this._close(results.exitCode)
+       })
