@@ -1,5 +1,5 @@
 diff -ur node_modules/karma.orig/lib/executor.js node_modules/karma/lib/executor.js
---- node_modules/karma.orig/lib/executor.js	2022-04-19 10:53:57.169319278 -0700
+--- node_modules/karma.orig/lib/executor.js	2022-04-19 11:26:10.435803845 -0700
 +++ node_modules/karma/lib/executor.js	2022-04-19 10:32:13.502510213 -0700
 @@ -66,6 +66,7 @@
    }
@@ -18,7 +18,7 @@ diff -ur node_modules/karma.orig/lib/executor.js node_modules/karma/lib/executor
  
      if (!this.pendingCount) {
 diff -ur node_modules/karma.orig/lib/launcher.js node_modules/karma/lib/launcher.js
---- node_modules/karma.orig/lib/launcher.js	2022-04-19 10:53:57.261318329 -0700
+--- node_modules/karma.orig/lib/launcher.js	2022-04-19 11:26:10.439803799 -0700
 +++ node_modules/karma/lib/launcher.js	2022-04-19 10:53:39.261503689 -0700
 @@ -48,7 +48,10 @@
        'config.processKillTimeout'
@@ -33,7 +33,7 @@ diff -ur node_modules/karma.orig/lib/launcher.js node_modules/karma/lib/launcher
  
    getBrowserById (id) {
 diff -ur node_modules/karma.orig/lib/launchers/base.js node_modules/karma/lib/launchers/base.js
---- node_modules/karma.orig/lib/launchers/base.js	2022-04-19 10:53:56.881322245 -0700
+--- node_modules/karma.orig/lib/launchers/base.js	2022-04-19 11:26:10.431803891 -0700
 +++ node_modules/karma/lib/launchers/base.js	2022-04-19 10:53:38.045516204 -0700
 @@ -53,12 +53,14 @@
    }
@@ -58,8 +58,83 @@ diff -ur node_modules/karma.orig/lib/launchers/base.js node_modules/karma/lib/la
      return killingPromise
    }
  
+diff -ur node_modules/karma.orig/lib/launchers/process.js node_modules/karma/lib/launchers/process.js
+--- node_modules/karma.orig/lib/launchers/process.js	2022-04-19 11:26:10.439803799 -0700
++++ node_modules/karma/lib/launchers/process.js	2022-04-19 12:52:41.893532954 -0700
+@@ -6,6 +6,7 @@
+   const self = this
+   let onExitCallback
+   const killTimeout = processKillTimeout || 2000
++console.log('ProcessLauncher killTimeout', killTimeout, 'ms');
+   // Will hold output from the spawned child process
+   const streamedOutputs = {
+     stdout: '',
+@@ -21,9 +22,11 @@
+ 
+   this.on('kill', function (done) {
+     if (!self._process) {
++console.log('on kill no process');
+       return process.nextTick(done)
+     }
+ 
++console.log('on kill');
+     onExitCallback = done
+     self._process.kill()
+     self._killTimer = timer.setTimeout(self._onKillTimeout, killTimeout)
+@@ -80,10 +83,12 @@
+     self._process.stderr.on('data', self._onStderr)
+ 
+     self._process.on('exit', function (code, signal) {
++console.log('ProcessLauncher._process on exit', {code, signal});
+       self._onProcessExit(code, signal, errorOutput)
+     })
+ 
+     self._process.on('error', function (err) {
++console.log('ProcessLauncher._process on error', {err});
+       if (err.code === 'ENOENT') {
+         self._retryLimit = -1
+         errorOutput = `Can not find the binary ${cmd}\n\tPlease set env variable ${self.ENV_CMD}`
+@@ -136,22 +141,29 @@
+   }
+ 
+   this._clearTempDirAndReportDone = function (error) {
++console.log('ProcessLauncher._clearTempDirAndReportDone');
+     tempDir.remove(self._tempDir, function () {
+       self._done(error)
+       if (onExitCallback) {
++console.log('ProcessLauncher.kill done');
+         onExitCallback()
+         onExitCallback = null
++      } else {
++console.log('ProcessLauncher done clearing, no exit callback!');
+       }
+     })
+   }
+ 
+   this._onKillTimeout = function () {
+     if (self.state !== self.STATE_BEING_KILLED && self.state !== self.STATE_BEING_FORCE_KILLED) {
++console.log('ProcessLauncher._onKillTimeout ignored', self.state);
+       return
+     }
++console.log('ProcessLauncher._onKillTimeout', self.state);
+ 
+     log.warn(`${self.name} was not killed in ${killTimeout} ms, sending SIGKILL.`)
+     self._process.kill('SIGKILL')
++console.log('ProcessLauncher._onKillTimeout SIGKILL sent');
+ 
+     // NOTE: https://github.com/karma-runner/karma/pull/1184
+     // NOTE: SIGKILL is just a signal.  Processes should never ignore it, but they can.
+@@ -160,6 +172,7 @@
+     // This a certainly suboptimal, but it is better than having the test harness hang waiting
+     // for a zombie child process to exit.
+     self._killTimer = timer.setTimeout(function () {
++console.log('ProcessLauncher._onKillTimeout SIGKILL timeout');
+       log.warn(`${self.name} was not killed by SIGKILL in ${killTimeout} ms, continuing.`)
+       self._onProcessExit(-1, null, '')
+     }, killTimeout)
+Only in node_modules/karma/lib/launchers: .process.js.swp
 diff -ur node_modules/karma.orig/lib/middleware/proxy.js node_modules/karma/lib/middleware/proxy.js
---- node_modules/karma.orig/lib/middleware/proxy.js	2022-04-19 10:53:57.305317877 -0700
+--- node_modules/karma.orig/lib/middleware/proxy.js	2022-04-19 11:26:10.439803799 -0700
 +++ node_modules/karma/lib/middleware/proxy.js	2022-04-19 10:44:21.055275364 -0700
 @@ -116,6 +116,7 @@
  exports.create = function (/* config */config, /* config.proxies */proxies, /* emitter */emitter) {
@@ -70,7 +145,7 @@ diff -ur node_modules/karma.orig/lib/middleware/proxy.js node_modules/karma/lib/
      proxyRecords.forEach((proxyRecord) => {
        proxyRecord.agent.destroy()
 diff -ur node_modules/karma.orig/lib/server.js node_modules/karma/lib/server.js
---- node_modules/karma.orig/lib/server.js	2022-04-19 10:53:57.325317671 -0700
+--- node_modules/karma.orig/lib/server.js	2022-04-19 11:26:10.439803799 -0700
 +++ node_modules/karma/lib/server.js	2022-04-19 10:44:55.890920009 -0700
 @@ -175,6 +175,7 @@
      const name = 'exit'
@@ -119,6 +194,7 @@ diff -ur node_modules/karma.orig/lib/server.js node_modules/karma/lib/server.js
          this.log.debug('Run complete, exiting.')
          this._close(results.exitCode)
        })
+Only in node_modules/karma.orig/node_modules: source-map
 diff -ur node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-local-wd-launcher/index.js
 --- node_modules/karma-local-wd-launcher.orig/index.js	2022-04-19 11:26:10.423803984 -0700
 +++ node_modules/karma-local-wd-launcher/index.js	2022-04-19 11:27:30.994866974 -0700
