@@ -1,5 +1,6 @@
---- node_modules/karma/lib/executor.js.orig        2022-04-19 09:17:30.000000000 -0700
-+++ node_modules/karma/lib/executor.js     2022-04-19 09:17:32.000000000 -0700
+diff -ur node_modules/karma.orig/lib/executor.js node_modules/karma/lib/executor.js
+--- node_modules/karma.orig/lib/executor.js	2022-04-19 10:53:57.169319278 -0700
++++ node_modules/karma/lib/executor.js	2022-04-19 10:32:13.502510213 -0700
 @@ -66,6 +66,7 @@
    }
  
@@ -16,7 +17,60 @@
      this.pendingCount--
  
      if (!this.pendingCount) {
---- node_modules/karma/lib/server.js.orig	2022-04-19 10:33:00.886050533 -0700
+diff -ur node_modules/karma.orig/lib/launcher.js node_modules/karma/lib/launcher.js
+--- node_modules/karma.orig/lib/launcher.js	2022-04-19 10:53:57.261318329 -0700
++++ node_modules/karma/lib/launcher.js	2022-04-19 10:53:39.261503689 -0700
+@@ -48,7 +48,10 @@
+       'config.processKillTimeout'
+     ]
+ 
+-    this._emitter.on('exit', (callback) => this.killAll(callback))
++    this._emitter.on('exit', (callback) => {
++console.log('launcher exit');
++      this.killAll(callback);
++    });
+   }
+ 
+   getBrowserById (id) {
+diff -ur node_modules/karma.orig/lib/launchers/base.js node_modules/karma/lib/launchers/base.js
+--- node_modules/karma.orig/lib/launchers/base.js	2022-04-19 10:53:56.881322245 -0700
++++ node_modules/karma/lib/launchers/base.js	2022-04-19 10:53:38.045516204 -0700
+@@ -53,12 +53,14 @@
+   }
+ 
+   this.kill = function () {
++console.log('BaseLauncher.kill');
+     // Already killed, or being killed.
+     if (killingPromise) {
+       return killingPromise
+     }
+ 
+     killingPromise = this.emitAsync('kill').then(() => {
++console.log('killing Promise resolved');
+       this.state = FINISHED
+     })
+ 
+@@ -71,6 +73,7 @@
+     this.kill()
+     this.state = BEING_FORCE_KILLED
+ 
++console.log('BaseLauncher.forceKill');
+     return killingPromise
+   }
+ 
+diff -ur node_modules/karma.orig/lib/middleware/proxy.js node_modules/karma/lib/middleware/proxy.js
+--- node_modules/karma.orig/lib/middleware/proxy.js	2022-04-19 10:53:57.305317877 -0700
++++ node_modules/karma/lib/middleware/proxy.js	2022-04-19 10:44:21.055275364 -0700
+@@ -116,6 +116,7 @@
+ exports.create = function (/* config */config, /* config.proxies */proxies, /* emitter */emitter) {
+   const proxyRecords = parseProxyConfig(proxies, config)
+   emitter.on('exit', (done) => {
++console.log('proxy exit');
+     log.debug('Destroying proxy agents')
+     proxyRecords.forEach((proxyRecord) => {
+       proxyRecord.agent.destroy()
+diff -ur node_modules/karma.orig/lib/server.js node_modules/karma/lib/server.js
+--- node_modules/karma.orig/lib/server.js	2022-04-19 10:53:57.325317671 -0700
 +++ node_modules/karma/lib/server.js	2022-04-19 10:44:55.890920009 -0700
 @@ -175,6 +175,7 @@
      const name = 'exit'
@@ -65,52 +119,3 @@
          this.log.debug('Run complete, exiting.')
          this._close(results.exitCode)
        })
---- node_modules/karma/lib/middleware/proxy.js.orig	2022-04-19 10:44:15.891327976 -0700
-+++ node_modules/karma/lib/middleware/proxy.js	2022-04-19 10:44:21.055275364 -0700
-@@ -116,6 +116,7 @@
- exports.create = function (/* config */config, /* config.proxies */proxies, /* emitter */emitter) {
-   const proxyRecords = parseProxyConfig(proxies, config)
-   emitter.on('exit', (done) => {
-+console.log('proxy exit');
-     log.debug('Destroying proxy agents')
-     proxyRecords.forEach((proxyRecord) => {
-       proxyRecord.agent.destroy()
---- node_modules/karma/lib/launcher.js.orig	2022-04-19 10:44:47.607004582 -0700
-+++ node_modules/karma/lib/launcher.js	2022-04-19 10:44:49.818982003 -0700
-@@ -48,7 +48,10 @@
-       'config.processKillTimeout'
-     ]
- 
--    this._emitter.on('exit', (callback) => this.killAll(callback));
-+    this._emitter.on('exit', (callback) => {
-+console.log('launcher exit');
-+      this.killAll(callback);
-+    });
-   }
- 
-   getBrowserById (id) {
---- node_modules/karma/lib/launchers/base.js.orig	2022-04-19 10:49:25.660142686 -0700
-+++ node_modules/karma/lib/launchers/base.js	2022-04-19 10:50:34.159430518 -0700
-@@ -53,12 +53,14 @@
-   }
- 
-   this.kill = function () {
-+console.log('BaseLauncher.kill');
-     // Already killed, or being killed.
-     if (killingPromise) {
-       return killingPromise
-     }
- 
-     killingPromise = this.emitAsync('kill').then(() => {
-+console.log('killing Promise resolved');
-       this.state = FINISHED
-     })
- 
-@@ -71,6 +73,7 @@
-     this.kill()
-     this.state = BEING_FORCE_KILLED
- 
-+console.log('BaseLauncher.forceKill');
-     return killingPromise
-   }
- 
