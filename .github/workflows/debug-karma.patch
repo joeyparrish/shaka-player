@@ -1,0 +1,19 @@
+--- node_modules/karma/lib/executor.js.orig        2022-04-19 09:17:30.000000000 -0700
++++ node_modules/karma/lib/executor.js     2022-04-19 09:17:32.000000000 -0700
+@@ -66,6 +66,7 @@
+   }
+ 
+   onRunComplete () {
++console.log('Executor.onRunComplete');
+     if (this.executionScheduled) {
+       this.schedule()
+     }
+@@ -77,6 +78,7 @@
+   }
+ 
+   onBrowserComplete () {
++console.log('Executor.onBrowserComplete');
+     this.pendingCount--
+ 
+     if (!this.pendingCount) {
+

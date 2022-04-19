@@ -20,41 +20,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
-
-      - name: Lint
-        run: python build/check.py
-
   build_and_test:
-    # Don't waste time doing a full matrix of test runs when there was an
-    # obvious linter error.
-    needs: lint
     strategy:
       matrix:
-        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-        browser: ["Chrome", "Firefox", "Edge", "Safari", "Safari-14"]
-        exclude:
-          - os: ubuntu-latest
-            browser: Edge
-          - os: windows-latest
-            browser: Safari
-          - os: windows-latest
-            browser: Safari-14
-          - os: ubuntu-latest
-            browser: Safari
-          - os: ubuntu-latest
-            browser: Safari-14
-        include:
-          # Run Linux browsers with xvfb, so they're in a headless X session.
-          - os: ubuntu-latest
-            extra_flags: "--use-xvfb"
+        os: ["macos-latest"]
+        browser: ["Safari"]
       # Disable fail-fast so that one matrix-job failing doesn't make the other
       # ones end early.
       fail-fast: false
@@ -108,23 +78,13 @@ jobs:
             browser="$PWD/.github/workflows/safari-homedir-launcher.sh"
           fi
 
+          # Install deps, freeze them, and patch karma for debugging Safari.
+          npm ci
+          touch node_modules/.last_update
+          patch -p0 -i .github/workflows/debug-karma.patch
+
           python build/test.py \
             --browsers "$browser" \
             --reporters spec --spec-hide-passed \
             --drm \
             ${{ matrix.extra_flags }}
-
-  build_in_docker:
-    # Don't waste time doing a full matrix of test runs when there was an
-    # obvious linter error.
-    needs: lint
-    name: Docker
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
-
-      - name: Docker
-        run: docker-compose -f build/docker/docker-compose.yml up
