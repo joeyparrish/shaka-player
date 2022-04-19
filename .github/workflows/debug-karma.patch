@@ -16,9 +16,25 @@
      this.pendingCount--
  
      if (!this.pendingCount) {
---- node_modules/karma/lib/server.js.orig       2022-04-19 09:34:32.000000000 -0700
-+++ node_modules/karma/lib/server.js    2022-04-19 09:34:35.000000000 -0700
-@@ -347,12 +347,14 @@
+--- node_modules/karma/lib/server.js.orig	2022-04-19 10:33:00.886050533 -0700
++++ node_modules/karma/lib/server.js	2022-04-19 10:44:55.890920009 -0700
+@@ -175,6 +175,7 @@
+     const name = 'exit'
+     let pending = this.listeners(name).length
+     const deferred = helper.defer()
++console.log('Server.emitExitAsync', {code, pending});
+ 
+     function resolve () {
+       deferred.resolve(code)
+@@ -182,6 +183,7 @@
+ 
+     try {
+       this.emit(name, (newCode) => {
++console.log('Server.emit return', {newCode, pending});
+         if (newCode && typeof newCode === 'number') {
+           // Only update code if it is given and not zero
+           code = newCode
+@@ -347,12 +349,14 @@
  
      if (config.singleRun) {
        this.on('browser_restart_failure', (completedBrowser) => {
@@ -33,7 +49,7 @@
          singleRunDoneBrowsers[completedBrowser.id] = true
  
          if (launcher.kill(completedBrowser.id)) {
-@@ -363,6 +365,7 @@
+@@ -363,6 +367,7 @@
        })
  
        this.on('browser_process_failure', (browserLauncher) => {
@@ -41,7 +57,7 @@
          singleRunDoneBrowsers[browserLauncher.id] = true
          singleRunBrowserNotCaptured = true
  
-@@ -370,6 +373,7 @@
+@@ -370,6 +375,7 @@
        })
  
        this.on('run_complete', (browsers, results) => {
@@ -49,3 +65,27 @@
          this.log.debug('Run complete, exiting.')
          this._close(results.exitCode)
        })
+--- node_modules/karma/lib/middleware/proxy.js.orig	2022-04-19 10:44:15.891327976 -0700
++++ node_modules/karma/lib/middleware/proxy.js	2022-04-19 10:44:21.055275364 -0700
+@@ -116,6 +116,7 @@
+ exports.create = function (/* config */config, /* config.proxies */proxies, /* emitter */emitter) {
+   const proxyRecords = parseProxyConfig(proxies, config)
+   emitter.on('exit', (done) => {
++console.log('proxy exit');
+     log.debug('Destroying proxy agents')
+     proxyRecords.forEach((proxyRecord) => {
+       proxyRecord.agent.destroy()
+--- node_modules/karma/lib/launcher.js.orig	2022-04-19 10:44:47.607004582 -0700
++++ node_modules/karma/lib/launcher.js	2022-04-19 10:44:49.818982003 -0700
+@@ -48,7 +48,10 @@
+       'config.processKillTimeout'
+     ]
+ 
+-    this._emitter.on('exit', (callback) => this.killAll(callback));
++    this._emitter.on('exit', (callback) => {
++console.log('launcher exit');
++      this.killAll(callback);
++    });
+   }
+ 
+   getBrowserById (id) {
