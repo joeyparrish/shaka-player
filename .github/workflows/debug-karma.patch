@@ -895,10 +895,10 @@ Only in node_modules/karma/node_modules: yauzl
 Only in node_modules/karma/node_modules: yocto-queue
 Only in node_modules/karma: package-lock.json
 diff --git node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-local-wd-launcher/index.js
-index 547a435..710ee13 100644
+index 284b320..7162304 100644
 --- node_modules/karma-local-wd-launcher.orig/index.js
 +++ node_modules/karma-local-wd-launcher/index.js
-@@ -112,13 +112,27 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
+@@ -115,8 +115,10 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
    // properly, we need to reimplement all the methods that could trigger a
    // 'kill' event.
    this.kill = async () => {
@@ -908,26 +908,27 @@ index 547a435..710ee13 100644
 +console.log('karma-local-wd-launcher kill complete', this.state);
    };
  
-+  this.forceKillOperation_ = null;
-+
-   this.forceKill = async () => {
-+    if (this.state == 'BEING_FORCE_KILLED') {
+   this.forceKillOperation_ = null;
+@@ -125,12 +127,17 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
+     // Don't nest force-kill operations.  If forceKill() was already called,
+     // just return the same Promise again.
+     if (this.state == 'BEING_FORCE_KILLED') {
+-      return this.forceKillOperation_;
 +console.log('karma-local-wd-launcher forceKill delegate', this.state);
-+      return this.forceKillOperation_.then(() => {
++     return this.forceKillOperation_.then(() => {
 +console.log('karma-local-wd-launcher forceKill delegate complete', this.state);
-+      });
-+    }
-+
++     });
+     }
+ 
 +console.log('karma-local-wd-launcher forceKill', this.state);
      this.state = 'BEING_FORCE_KILLED';
--    await this.stopWebdriver_();
-+    this.forceKillOperation_ = this.stopWebdriver_();
-+    await this.forceKillOperation_;
+     this.forceKillOperation_ = this.stopWebdriver_();
+     await this.forceKillOperation_;
 +console.log('karma-local-wd-launcher forceKill complete', this.state);
    };
  
    const originalStart = this.start;
-@@ -161,6 +175,7 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
+@@ -173,6 +180,7 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
      if (this.state == 'BEING_FORCE_KILLED') {
        return;
      }
@@ -935,7 +936,7 @@ index 547a435..710ee13 100644
  
      this.state = 'RESTARTING';
      await this.stopWebdriver_();
-@@ -169,18 +184,26 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
+@@ -181,22 +189,29 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
        log.debug(`Restarting ${this.name}`)
        this.start(previousUrl);
      }
@@ -944,15 +945,18 @@ index 547a435..710ee13 100644
  
    this.stopWebdriver_ = async () => {
 +console.log('karma-local-wd-launcher stopWebdriver_', this.state);
-+
      if (this.browser) {
 +console.log('karma-local-wd-launcher stop session', this.state);
-       await new Promise(resolve => this.browser.quit(resolve));
+       // If it takes too long to close the session, give up and move on.
+       await Promise.race([
+         delay(CLOSE_WEBDRIVER_SESSION_TIMEOUT_SECONDS),
+         new Promise(resolve => this.browser.quit(resolve)),
+       ]);
 +console.log('karma-local-wd-launcher stop session complete', this.state);
      }
  
-     // Now that the driver connection and browser are closed, emit the signal
-     // that shuts down the driver executable.
+     // Now that the driver connection and browser are closed (or have timed
+     // out), emit the signal that shuts down the driver executable.
 +console.log('karma-local-wd-launcher emit kill', this.state);
      await this.emitAsync('kill');
 +console.log('karma-local-wd-launcher emit kill complete', this.state);
