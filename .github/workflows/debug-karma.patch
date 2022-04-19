@@ -89,3 +89,28 @@
    }
  
    getBrowserById (id) {
+--- node_modules/karma/lib/launchers/base.js.orig	2022-04-19 10:49:25.660142686 -0700
++++ node_modules/karma/lib/launchers/base.js	2022-04-19 10:50:34.159430518 -0700
+@@ -53,12 +53,14 @@
+   }
+ 
+   this.kill = function () {
++console.log('BaseLauncher.kill');
+     // Already killed, or being killed.
+     if (killingPromise) {
+       return killingPromise
+     }
+ 
+     killingPromise = this.emitAsync('kill').then(() => {
++console.log('killing Promise resolved');
+       this.state = FINISHED
+     })
+ 
+@@ -71,6 +73,7 @@
+     this.kill()
+     this.state = BEING_FORCE_KILLED
+ 
++console.log('BaseLauncher.forceKill');
+     return killingPromise
+   }
+ 
