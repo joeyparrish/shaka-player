@@ -1,6 +1,6 @@
 diff -ur node_modules/karma.orig/lib/executor.js node_modules/karma/lib/executor.js
 --- node_modules/karma.orig/lib/executor.js	2022-04-19 11:26:10.435803845 -0700
-+++ node_modules/karma/lib/executor.js	2022-04-19 10:32:13.502510213 -0700
++++ node_modules/karma/lib/executor.js	2022-04-19 13:16:59.793887164 -0700
 @@ -66,6 +66,7 @@
    }
  
@@ -17,9 +17,10 @@ diff -ur node_modules/karma.orig/lib/executor.js node_modules/karma/lib/executor
      this.pendingCount--
  
      if (!this.pendingCount) {
+Only in node_modules/karma/lib: .executor.js.swp
 diff -ur node_modules/karma.orig/lib/launcher.js node_modules/karma/lib/launcher.js
 --- node_modules/karma.orig/lib/launcher.js	2022-04-19 11:26:10.439803799 -0700
-+++ node_modules/karma/lib/launcher.js	2022-04-19 10:53:39.261503689 -0700
++++ node_modules/karma/lib/launcher.js	2022-04-19 13:19:17.760071080 -0700
 @@ -48,7 +48,10 @@
        'config.processKillTimeout'
      ]
@@ -32,32 +33,29 @@ diff -ur node_modules/karma.orig/lib/launcher.js node_modules/karma/lib/launcher
    }
  
    getBrowserById (id) {
-diff -ur node_modules/karma.orig/lib/launchers/base.js node_modules/karma/lib/launchers/base.js
---- node_modules/karma.orig/lib/launchers/base.js	2022-04-19 11:26:10.431803891 -0700
-+++ node_modules/karma/lib/launchers/base.js	2022-04-19 10:53:38.045516204 -0700
-@@ -53,12 +53,14 @@
+@@ -160,6 +163,7 @@
    }
  
-   this.kill = function () {
-+console.log('BaseLauncher.kill');
-     // Already killed, or being killed.
-     if (killingPromise) {
-       return killingPromise
-     }
+   killAll (callback) {
++console.log('Launcher.killAll', {callback});
+     callback = callback || function () {}
+     log.debug('Disconnecting all browsers')
  
-     killingPromise = this.emitAsync('kill').then(() => {
-+console.log('killing Promise resolved');
-       this.state = FINISHED
-     })
- 
-@@ -71,6 +73,7 @@
-     this.kill()
-     this.state = BEING_FORCE_KILLED
- 
-+console.log('BaseLauncher.forceKill');
-     return killingPromise
+@@ -170,7 +174,11 @@
+     Promise.all(
+       this._browsers
+         .map((browser) => browser.forceKill())
+-    ).then(callback)
++    ).then(() => {
++      console.log('Launcher forceKill all complete');
++    }).then(callback).then(() => {
++      console.log('Launcher forceKill all callback complete');
++    });
    }
  
+   areAllCaptured () {
+Only in node_modules/karma/lib: .launcher.js.swp
+Only in node_modules/karma/lib/launchers: .base.js.swp
 diff -ur node_modules/karma.orig/lib/launchers/process.js node_modules/karma/lib/launchers/process.js
 --- node_modules/karma.orig/lib/launchers/process.js	2022-04-19 11:26:10.439803799 -0700
 +++ node_modules/karma/lib/launchers/process.js	2022-04-19 12:52:41.893532954 -0700
@@ -226,3 +224,4 @@ diff -ur node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-l
  
      this.state = 'FINISHED';
    };
+Only in node_modules/karma-local-wd-launcher: .index.js.swp
