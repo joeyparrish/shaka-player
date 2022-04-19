@@ -58,7 +58,7 @@ Only in node_modules/karma/lib: .launcher.js.swp
 Only in node_modules/karma/lib/launchers: .base.js.swp
 diff -ur node_modules/karma.orig/lib/launchers/process.js node_modules/karma/lib/launchers/process.js
 --- node_modules/karma.orig/lib/launchers/process.js	2022-04-19 11:26:10.439803799 -0700
-+++ node_modules/karma/lib/launchers/process.js	2022-04-19 12:52:41.893532954 -0700
++++ node_modules/karma/lib/launchers/process.js	2022-04-19 13:26:53.670079278 -0700
 @@ -6,6 +6,7 @@
    const self = this
    let onExitCallback
@@ -71,11 +71,11 @@ diff -ur node_modules/karma.orig/lib/launchers/process.js node_modules/karma/lib
  
    this.on('kill', function (done) {
      if (!self._process) {
-+console.log('on kill no process');
++console.log('ProcessLauncher on kill no process');
        return process.nextTick(done)
      }
  
-+console.log('on kill');
++console.log('ProcessLauncher on kill');
      onExitCallback = done
      self._process.kill()
      self._killTimer = timer.setTimeout(self._onKillTimeout, killTimeout)
@@ -195,32 +195,52 @@ diff -ur node_modules/karma.orig/lib/server.js node_modules/karma/lib/server.js
 Only in node_modules/karma.orig/node_modules: source-map
 diff -ur node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-local-wd-launcher/index.js
 --- node_modules/karma-local-wd-launcher.orig/index.js	2022-04-19 11:26:10.423803984 -0700
-+++ node_modules/karma-local-wd-launcher/index.js	2022-04-19 11:27:30.994866974 -0700
-@@ -117,8 +117,10 @@
++++ node_modules/karma-local-wd-launcher/index.js	2022-04-19 13:30:31.083226713 -0700
+@@ -112,13 +112,17 @@
+   // properly, we need to reimplement all the methods that could trigger a
+   // 'kill' event.
+   this.kill = async () => {
++console.log('karma-local-wd-launcher kill', this.state);
+     this.state = 'BEING_KILLED';
+     await this.stopWebdriver_();
++console.log('karma-local-wd-launcher kill complete', this.state);
    };
  
    this.forceKill = async () => {
-+console.log('karma-local-wd-launcher forceKill');
++console.log('karma-local-wd-launcher forceKill', this.state);
      this.state = 'BEING_FORCE_KILLED';
      await this.stopWebdriver_();
-+console.log('karma-local-wd-launcher forceKill complete');
++console.log('karma-local-wd-launcher forceKill complete', this.state);
    };
  
    const originalStart = this.start;
-@@ -173,12 +175,16 @@
+@@ -161,6 +165,7 @@
+     if (this.state == 'BEING_FORCE_KILLED') {
+       return;
+     }
++console.log('karma-local-wd-launcher restart');
+ 
+     this.state = 'RESTARTING';
+     await this.stopWebdriver_();
+@@ -169,16 +174,21 @@
+       log.debug(`Restarting ${this.name}`)
+       this.start(previousUrl);
+     }
++console.log('karma-local-wd-launcher restart complete');
+   };
  
    this.stopWebdriver_ = async () => {
      if (this.browser) {
-+console.log('karma-local-wd-launcher stop session');
++console.log('karma-local-wd-launcher stop session', this.state);
        await new Promise(resolve => this.browser.quit(resolve));
-+console.log('karma-local-wd-launcher stop session complete');
++console.log('karma-local-wd-launcher stop session complete', this.state);
      }
  
      // Now that the driver connection and browser are closed, emit the signal
      // that shuts down the driver executable.
-+console.log('karma-local-wd-launcher emit kill');
++console.log('karma-local-wd-launcher emit kill', this.state);
      await this.emitAsync('kill');
-+console.log('karma-local-wd-launcher emit kill complete');
++console.log('karma-local-wd-launcher emit kill complete', this.state);
  
      this.state = 'FINISHED';
    };
