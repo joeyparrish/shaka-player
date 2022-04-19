@@ -1,5 +1,5 @@
 diff -ur node_modules/karma.orig/lib/executor.js node_modules/karma/lib/executor.js
---- node_modules/karma.orig/lib/executor.js	2022-04-19 11:26:10.435803845 -0700
+--- node_modules/karma.orig/lib/executor.js	2022-04-19 14:20:52.644805699 -0700
 +++ node_modules/karma/lib/executor.js	2022-04-19 13:16:59.793887164 -0700
 @@ -66,6 +66,7 @@
    }
@@ -17,10 +17,9 @@ diff -ur node_modules/karma.orig/lib/executor.js node_modules/karma/lib/executor
      this.pendingCount--
  
      if (!this.pendingCount) {
-Only in node_modules/karma/lib: .executor.js.swp
 diff -ur node_modules/karma.orig/lib/launcher.js node_modules/karma/lib/launcher.js
---- node_modules/karma.orig/lib/launcher.js	2022-04-19 11:26:10.439803799 -0700
-+++ node_modules/karma/lib/launcher.js	2022-04-19 13:19:17.760071080 -0700
+--- node_modules/karma.orig/lib/launcher.js	2022-04-19 14:20:52.800803746 -0700
++++ node_modules/karma/lib/launcher.js	2022-04-19 14:11:56.167517842 -0700
 @@ -48,7 +48,10 @@
        'config.processKillTimeout'
      ]
@@ -33,15 +32,16 @@ diff -ur node_modules/karma.orig/lib/launcher.js node_modules/karma/lib/launcher
    }
  
    getBrowserById (id) {
-@@ -160,6 +163,7 @@
+@@ -160,6 +163,8 @@
    }
  
    killAll (callback) {
-+console.log('Launcher.killAll', {callback});
++const browsers = this._browsers.map(b => b.name);
++console.log('Launcher.killAll', {callback, browsers});
      callback = callback || function () {}
      log.debug('Disconnecting all browsers')
  
-@@ -170,7 +174,11 @@
+@@ -170,7 +175,11 @@
      Promise.all(
        this._browsers
          .map((browser) => browser.forceKill())
@@ -54,11 +54,9 @@ diff -ur node_modules/karma.orig/lib/launcher.js node_modules/karma/lib/launcher
    }
  
    areAllCaptured () {
-Only in node_modules/karma/lib: .launcher.js.swp
-Only in node_modules/karma/lib/launchers: .base.js.swp
 diff -ur node_modules/karma.orig/lib/launchers/process.js node_modules/karma/lib/launchers/process.js
---- node_modules/karma.orig/lib/launchers/process.js	2022-04-19 11:26:10.439803799 -0700
-+++ node_modules/karma/lib/launchers/process.js	2022-04-19 13:26:53.670079278 -0700
+--- node_modules/karma.orig/lib/launchers/process.js	2022-04-19 14:20:52.848803145 -0700
++++ node_modules/karma/lib/launchers/process.js	2022-04-19 14:09:48.533112575 -0700
 @@ -6,6 +6,7 @@
    const self = this
    let onExitCallback
@@ -132,7 +130,7 @@ diff -ur node_modules/karma.orig/lib/launchers/process.js node_modules/karma/lib
      }, killTimeout)
 Only in node_modules/karma/lib/launchers: .process.js.swp
 diff -ur node_modules/karma.orig/lib/middleware/proxy.js node_modules/karma/lib/middleware/proxy.js
---- node_modules/karma.orig/lib/middleware/proxy.js	2022-04-19 11:26:10.439803799 -0700
+--- node_modules/karma.orig/lib/middleware/proxy.js	2022-04-19 14:20:52.856803045 -0700
 +++ node_modules/karma/lib/middleware/proxy.js	2022-04-19 10:44:21.055275364 -0700
 @@ -116,6 +116,7 @@
  exports.create = function (/* config */config, /* config.proxies */proxies, /* emitter */emitter) {
@@ -143,7 +141,7 @@ diff -ur node_modules/karma.orig/lib/middleware/proxy.js node_modules/karma/lib/
      proxyRecords.forEach((proxyRecord) => {
        proxyRecord.agent.destroy()
 diff -ur node_modules/karma.orig/lib/server.js node_modules/karma/lib/server.js
---- node_modules/karma.orig/lib/server.js	2022-04-19 11:26:10.439803799 -0700
+--- node_modules/karma.orig/lib/server.js	2022-04-19 14:20:52.892802593 -0700
 +++ node_modules/karma/lib/server.js	2022-04-19 10:44:55.890920009 -0700
 @@ -175,6 +175,7 @@
      const name = 'exit'
@@ -192,11 +190,715 @@ diff -ur node_modules/karma.orig/lib/server.js node_modules/karma/lib/server.js
          this.log.debug('Run complete, exiting.')
          this._close(results.exitCode)
        })
-Only in node_modules/karma.orig/node_modules: source-map
-diff -ur node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-local-wd-launcher/index.js
---- node_modules/karma-local-wd-launcher.orig/index.js	2022-04-19 11:26:10.423803984 -0700
-+++ node_modules/karma-local-wd-launcher/index.js	2022-04-19 13:30:31.083226713 -0700
-@@ -112,13 +112,17 @@
+Only in node_modules/karma/node_modules: accepts
+Only in node_modules/karma/node_modules: acorn
+Only in node_modules/karma/node_modules: acorn-jsx
+Only in node_modules/karma/node_modules: acorn-node
+Only in node_modules/karma/node_modules: acorn-walk
+Only in node_modules/karma/node_modules: agent-base
+Only in node_modules/karma/node_modules: aggregate-error
+Only in node_modules/karma/node_modules: ajv
+Only in node_modules/karma/node_modules: ansi-colors
+Only in node_modules/karma/node_modules: ansicolors
+Only in node_modules/karma/node_modules: ansi-escapes
+Only in node_modules/karma/node_modules: ansi-regex
+Only in node_modules/karma/node_modules: ansi-styles
+Only in node_modules/karma/node_modules: anymatch
+Only in node_modules/karma/node_modules: any-promise
+Only in node_modules/karma/node_modules: argparse
+Only in node_modules/karma/node_modules: argv-formatter
+Only in node_modules/karma/node_modules: array-from
+Only in node_modules/karma/node_modules: array-ify
+Only in node_modules/karma/node_modules: array-includes
+Only in node_modules/karma/node_modules: array.prototype.flat
+Only in node_modules/karma/node_modules: array-union
+Only in node_modules/karma/node_modules: array-unique
+Only in node_modules/karma/node_modules: arr-diff
+Only in node_modules/karma/node_modules: arr-flatten
+Only in node_modules/karma/node_modules: arrify
+Only in node_modules/karma/node_modules: arr-union
+Only in node_modules/karma/node_modules: asn1.js
+Only in node_modules/karma/node_modules: assert
+Only in node_modules/karma/node_modules: assertion-error
+Only in node_modules/karma/node_modules: assertion-error-formatter
+Only in node_modules/karma/node_modules: assert-plus
+Only in node_modules/karma/node_modules: assign-symbols
+Only in node_modules/karma/node_modules: astral-regex
+Only in node_modules/karma/node_modules: async-each
+Only in node_modules/karma/node_modules: asynckit
+Only in node_modules/karma/node_modules: async-limiter
+Only in node_modules/karma/node_modules: at-least-node
+Only in node_modules/karma/node_modules: atob
+Only in node_modules/karma/node_modules: @babel
+Only in node_modules/karma/node_modules: balanced-match
+Only in node_modules/karma/node_modules: base
+Only in node_modules/karma/node_modules: base64id
+Only in node_modules/karma/node_modules: base64-js
+Only in node_modules/karma/node_modules: becke-ch--regex--s0-0-v1--base--pl--lib
+Only in node_modules/karma/node_modules: before-after-hook
+Only in node_modules/karma/node_modules: .bin
+Only in node_modules/karma/node_modules: binary-extensions
+Only in node_modules/karma/node_modules: bluebird
+Only in node_modules/karma/node_modules: bn.js
+Only in node_modules/karma/node_modules: body-parser
+Only in node_modules/karma/node_modules: bottleneck
+Only in node_modules/karma/node_modules: brace-expansion
+Only in node_modules/karma/node_modules: braces
+Only in node_modules/karma/node_modules: brorand
+Only in node_modules/karma/node_modules: browserify
+Only in node_modules/karma/node_modules: browserify-aes
+Only in node_modules/karma/node_modules: browserify-cipher
+Only in node_modules/karma/node_modules: browserify-des
+Only in node_modules/karma/node_modules: browserify-rsa
+Only in node_modules/karma/node_modules: browserify-sign
+Only in node_modules/karma/node_modules: browserify-zlib
+Only in node_modules/karma/node_modules: browser-pack
+Only in node_modules/karma/node_modules: browser-resolve
+Only in node_modules/karma/node_modules: browserstack
+Only in node_modules/karma/node_modules: browserstack-local
+Only in node_modules/karma/node_modules: browser-stdout
+Only in node_modules/karma/node_modules: buffer
+Only in node_modules/karma/node_modules: buffer-crc32
+Only in node_modules/karma/node_modules: buffer-from
+Only in node_modules/karma/node_modules: buffer-xor
+Only in node_modules/karma/node_modules: builtin-status-codes
+Only in node_modules/karma/node_modules: bytes
+Only in node_modules/karma/node_modules: cache-base
+Only in node_modules/karma/node_modules: cached-path-relative
+Only in node_modules/karma/node_modules: call-bind
+Only in node_modules/karma/node_modules: callsites
+Only in node_modules/karma/node_modules: camelcase
+Only in node_modules/karma/node_modules: camelcase-keys
+Only in node_modules/karma/node_modules: cardinal
+Only in node_modules/karma/node_modules: chai
+Only in node_modules/karma/node_modules: chai-as-promised
+Only in node_modules/karma/node_modules: chai-subset
+Only in node_modules/karma/node_modules: chalk
+Only in node_modules/karma/node_modules: check-error
+Only in node_modules/karma/node_modules: chokidar
+Only in node_modules/karma/node_modules: cipher-base
+Only in node_modules/karma/node_modules: class-utils
+Only in node_modules/karma/node_modules: clean-stack
+Only in node_modules/karma/node_modules: cli-table3
+Only in node_modules/karma/node_modules: cliui
+Only in node_modules/karma/node_modules: collection-visit
+Only in node_modules/karma/node_modules: color-convert
+Only in node_modules/karma/node_modules: color-name
+Only in node_modules/karma/node_modules: @colors
+Only in node_modules/karma/node_modules: colors
+Only in node_modules/karma/node_modules: combined-stream
+Only in node_modules/karma/node_modules: combine-source-map
+Only in node_modules/karma/node_modules: commander
+Only in node_modules/karma/node_modules: @commitlint
+Only in node_modules/karma/node_modules: compare-func
+Only in node_modules/karma/node_modules: component-emitter
+Only in node_modules/karma/node_modules: concat-map
+Only in node_modules/karma/node_modules: concat-stream
+Only in node_modules/karma/node_modules: connect
+Only in node_modules/karma/node_modules: console-browserify
+Only in node_modules/karma/node_modules: constants-browserify
+Only in node_modules/karma/node_modules: content-type
+Only in node_modules/karma/node_modules: conventional-changelog-angular
+Only in node_modules/karma/node_modules: conventional-changelog-writer
+Only in node_modules/karma/node_modules: conventional-commits-filter
+Only in node_modules/karma/node_modules: conventional-commits-parser
+Only in node_modules/karma/node_modules: convert-source-map
+Only in node_modules/karma/node_modules: cookie
+Only in node_modules/karma/node_modules: cookiejar
+Only in node_modules/karma/node_modules: copy-descriptor
+Only in node_modules/karma/node_modules: core-js-pure
+Only in node_modules/karma/node_modules: core-util-is
+Only in node_modules/karma/node_modules: cors
+Only in node_modules/karma/node_modules: cosmiconfig
+Only in node_modules/karma/node_modules: create-ecdh
+Only in node_modules/karma/node_modules: create-hash
+Only in node_modules/karma/node_modules: create-hmac
+Only in node_modules/karma/node_modules: cross-spawn
+Only in node_modules/karma/node_modules: crypto-browserify
+Only in node_modules/karma/node_modules: crypto-random-string
+Only in node_modules/karma/node_modules: cucumber
+Only in node_modules/karma/node_modules: cucumber-expressions
+Only in node_modules/karma/node_modules: cucumber-tag-expressions
+Only in node_modules/karma/node_modules: custom-event
+Only in node_modules/karma/node_modules: d
+Only in node_modules/karma/node_modules: dargs
+Only in node_modules/karma/node_modules: dash-ast
+Only in node_modules/karma/node_modules: date-format
+Only in node_modules/karma/node_modules: dateformat
+Only in node_modules/karma/node_modules: debug
+Only in node_modules/karma/node_modules: decamelize
+Only in node_modules/karma/node_modules: decamelize-keys
+Only in node_modules/karma/node_modules: decode-uri-component
+Only in node_modules/karma/node_modules: deep-eql
+Only in node_modules/karma/node_modules: deep-extend
+Only in node_modules/karma/node_modules: deep-is
+Only in node_modules/karma/node_modules: defined
+Only in node_modules/karma/node_modules: define-properties
+Only in node_modules/karma/node_modules: define-property
+Only in node_modules/karma/node_modules: del
+Only in node_modules/karma/node_modules: delayed-stream
+Only in node_modules/karma/node_modules: depd
+Only in node_modules/karma/node_modules: deprecation
+Only in node_modules/karma/node_modules: deps-sort
+Only in node_modules/karma/node_modules: des.js
+Only in node_modules/karma/node_modules: destroy
+Only in node_modules/karma/node_modules: detective
+Only in node_modules/karma/node_modules: di
+Only in node_modules/karma/node_modules: diff
+Only in node_modules/karma/node_modules: diffie-hellman
+Only in node_modules/karma/node_modules: dir-glob
+Only in node_modules/karma/node_modules: doctrine
+Only in node_modules/karma/node_modules: domain-browser
+Only in node_modules/karma/node_modules: dom-serialize
+Only in node_modules/karma/node_modules: dot-prop
+Only in node_modules/karma/node_modules: duplexer
+Only in node_modules/karma/node_modules: duplexer2
+Only in node_modules/karma/node_modules: duration
+Only in node_modules/karma/node_modules: ee-first
+Only in node_modules/karma/node_modules: elliptic
+Only in node_modules/karma/node_modules: emoji-regex
+Only in node_modules/karma/node_modules: encodeurl
+Only in node_modules/karma/node_modules: engine.io
+Only in node_modules/karma/node_modules: engine.io-parser
+Only in node_modules/karma/node_modules: enquirer
+Only in node_modules/karma/node_modules: ent
+Only in node_modules/karma/node_modules: env-ci
+Only in node_modules/karma/node_modules: error-ex
+Only in node_modules/karma/node_modules: error-stack-parser
+Only in node_modules/karma/node_modules: es5-ext
+Only in node_modules/karma/node_modules: es6-iterator
+Only in node_modules/karma/node_modules: es6-promise
+Only in node_modules/karma/node_modules: es6-promisify
+Only in node_modules/karma/node_modules: es6-symbol
+Only in node_modules/karma/node_modules: es-abstract
+Only in node_modules/karma/node_modules: escalade
+Only in node_modules/karma/node_modules: escape-html
+Only in node_modules/karma/node_modules: escape-string-regexp
+Only in node_modules/karma/node_modules: @eslint
+Only in node_modules/karma/node_modules: eslint
+Only in node_modules/karma/node_modules: eslint-config-standard
+Only in node_modules/karma/node_modules: eslint-import-resolver-node
+Only in node_modules/karma/node_modules: eslint-module-utils
+Only in node_modules/karma/node_modules: eslint-plugin-es
+Only in node_modules/karma/node_modules: eslint-plugin-import
+Only in node_modules/karma/node_modules: eslint-plugin-node
+Only in node_modules/karma/node_modules: eslint-plugin-promise
+Only in node_modules/karma/node_modules: eslint-plugin-standard
+Only in node_modules/karma/node_modules: eslint-scope
+Only in node_modules/karma/node_modules: eslint-utils
+Only in node_modules/karma/node_modules: eslint-visitor-keys
+Only in node_modules/karma/node_modules: espree
+Only in node_modules/karma/node_modules: esprima
+Only in node_modules/karma/node_modules: esquery
+Only in node_modules/karma/node_modules: esrecurse
+Only in node_modules/karma/node_modules: es-shim-unscopables
+Only in node_modules/karma/node_modules: es-to-primitive
+Only in node_modules/karma/node_modules: estraverse
+Only in node_modules/karma/node_modules: esutils
+Only in node_modules/karma/node_modules: eventemitter3
+Only in node_modules/karma/node_modules: events
+Only in node_modules/karma/node_modules: event-stream
+Only in node_modules/karma/node_modules: evp_bytestokey
+Only in node_modules/karma/node_modules: execa
+Only in node_modules/karma/node_modules: expand-brackets
+Only in node_modules/karma/node_modules: ext
+Only in node_modules/karma/node_modules: extend
+Only in node_modules/karma/node_modules: extend-shallow
+Only in node_modules/karma/node_modules: extglob
+Only in node_modules/karma/node_modules: extract-zip
+Only in node_modules/karma/node_modules: extsprintf
+Only in node_modules/karma/node_modules: fast-deep-equal
+Only in node_modules/karma/node_modules: fast-glob
+Only in node_modules/karma/node_modules: fast-json-stable-stringify
+Only in node_modules/karma/node_modules: fast-levenshtein
+Only in node_modules/karma/node_modules: fastq
+Only in node_modules/karma/node_modules: fast-safe-stringify
+Only in node_modules/karma/node_modules: fd-slicer
+Only in node_modules/karma/node_modules: figures
+Only in node_modules/karma/node_modules: file-entry-cache
+Only in node_modules/karma/node_modules: fill-keys
+Only in node_modules/karma/node_modules: fill-range
+Only in node_modules/karma/node_modules: finalhandler
+Only in node_modules/karma/node_modules: find-up
+Only in node_modules/karma/node_modules: find-versions
+Only in node_modules/karma/node_modules: flat-cache
+Only in node_modules/karma/node_modules: flatted
+Only in node_modules/karma/node_modules: follow-redirects
+Only in node_modules/karma/node_modules: for-in
+Only in node_modules/karma/node_modules: form-data
+Only in node_modules/karma/node_modules: formidable
+Only in node_modules/karma/node_modules: fragment-cache
+Only in node_modules/karma/node_modules: from
+Only in node_modules/karma/node_modules: from2
+Only in node_modules/karma/node_modules: fromentries
+Only in node_modules/karma/node_modules: fs-access
+Only in node_modules/karma/node_modules: fs-extra
+Only in node_modules/karma/node_modules: fs.realpath
+Only in node_modules/karma/node_modules: functional-red-black-tree
+Only in node_modules/karma/node_modules: function-bind
+Only in node_modules/karma/node_modules: get-assigned-identifiers
+Only in node_modules/karma/node_modules: get-caller-file
+Only in node_modules/karma/node_modules: get-func-name
+Only in node_modules/karma/node_modules: get-intrinsic
+Only in node_modules/karma/node_modules: get-stream
+Only in node_modules/karma/node_modules: get-symbol-description
+Only in node_modules/karma/node_modules: get-value
+Only in node_modules/karma/node_modules: gherkin
+Only in node_modules/karma/node_modules: git-log-parser
+Only in node_modules/karma/node_modules: git-raw-commits
+Only in node_modules/karma/node_modules: glob
+Only in node_modules/karma/node_modules: global-dirs
+Only in node_modules/karma/node_modules: globals
+Only in node_modules/karma/node_modules: globby
+Only in node_modules/karma/node_modules: glob-parent
+Only in node_modules/karma/node_modules: graceful-fs
+Only in node_modules/karma/node_modules: growl
+Only in node_modules/karma/node_modules: handlebars
+Only in node_modules/karma/node_modules: hard-rejection
+Only in node_modules/karma/node_modules: has
+Only in node_modules/karma/node_modules: has-bigints
+Only in node_modules/karma/node_modules: has-flag
+Only in node_modules/karma/node_modules: hash-base
+Only in node_modules/karma/node_modules: hash.js
+Only in node_modules/karma/node_modules: has-property-descriptors
+Only in node_modules/karma/node_modules: has-symbols
+Only in node_modules/karma/node_modules: has-tostringtag
+Only in node_modules/karma/node_modules: has-value
+Only in node_modules/karma/node_modules: has-values
+Only in node_modules/karma/node_modules: hat
+Only in node_modules/karma/node_modules: he
+Only in node_modules/karma/node_modules: hmac-drbg
+Only in node_modules/karma/node_modules: hook-std
+Only in node_modules/karma/node_modules: hosted-git-info
+Only in node_modules/karma/node_modules: htmlescape
+Only in node_modules/karma/node_modules: http2
+Only in node_modules/karma/node_modules: http-errors
+Only in node_modules/karma/node_modules: http-proxy
+Only in node_modules/karma/node_modules: http-proxy-agent
+Only in node_modules/karma/node_modules: https-browserify
+Only in node_modules/karma/node_modules: https-proxy-agent
+Only in node_modules/karma/node_modules: human-signals
+Only in node_modules/karma/node_modules: @humanwhocodes
+Only in node_modules/karma/node_modules: iconv-lite
+Only in node_modules/karma/node_modules: ieee754
+Only in node_modules/karma/node_modules: ignore
+Only in node_modules/karma/node_modules: import-fresh
+Only in node_modules/karma/node_modules: import-from
+Only in node_modules/karma/node_modules: imurmurhash
+Only in node_modules/karma/node_modules: indent-string
+Only in node_modules/karma/node_modules: inflight
+Only in node_modules/karma/node_modules: inherits
+Only in node_modules/karma/node_modules: ini
+Only in node_modules/karma/node_modules: inline-source-map
+Only in node_modules/karma/node_modules: insert-module-globals
+Only in node_modules/karma/node_modules: internal-slot
+Only in node_modules/karma/node_modules: into-stream
+Only in node_modules/karma/node_modules: is-accessor-descriptor
+Only in node_modules/karma/node_modules: isarray
+Only in node_modules/karma/node_modules: is-arrayish
+Only in node_modules/karma/node_modules: is-bigint
+Only in node_modules/karma/node_modules: isbinaryfile
+Only in node_modules/karma/node_modules: is-binary-path
+Only in node_modules/karma/node_modules: is-boolean-object
+Only in node_modules/karma/node_modules: is-buffer
+Only in node_modules/karma/node_modules: is-callable
+Only in node_modules/karma/node_modules: is-core-module
+Only in node_modules/karma/node_modules: is-data-descriptor
+Only in node_modules/karma/node_modules: is-date-object
+Only in node_modules/karma/node_modules: is-descriptor
+Only in node_modules/karma/node_modules: is-docker
+Only in node_modules/karma/node_modules: isexe
+Only in node_modules/karma/node_modules: is-extendable
+Only in node_modules/karma/node_modules: is-extglob
+Only in node_modules/karma/node_modules: is-fullwidth-code-point
+Only in node_modules/karma/node_modules: is-generator
+Only in node_modules/karma/node_modules: is-glob
+Only in node_modules/karma/node_modules: is-negative-zero
+Only in node_modules/karma/node_modules: is-number
+Only in node_modules/karma/node_modules: is-number-object
+Only in node_modules/karma/node_modules: is-obj
+Only in node_modules/karma/node_modules: is-object
+Only in node_modules/karma/node_modules: isobject
+Only in node_modules/karma/node_modules: is-path-cwd
+Only in node_modules/karma/node_modules: is-path-inside
+Only in node_modules/karma/node_modules: is-plain-obj
+Only in node_modules/karma/node_modules: is-plain-object
+Only in node_modules/karma/node_modules: is-regex
+Only in node_modules/karma/node_modules: is-running
+Only in node_modules/karma/node_modules: is-shared-array-buffer
+Only in node_modules/karma/node_modules: is-stream
+Only in node_modules/karma/node_modules: is-string
+Only in node_modules/karma/node_modules: issue-parser
+Only in node_modules/karma/node_modules: is-symbol
+Only in node_modules/karma/node_modules: is-text-path
+Only in node_modules/karma/node_modules: is-weakref
+Only in node_modules/karma/node_modules: is-windows
+Only in node_modules/karma/node_modules: is-wsl
+Only in node_modules/karma/node_modules: jasmine-core
+Only in node_modules/karma/node_modules: java-properties
+Only in node_modules/karma/node_modules: json5
+Only in node_modules/karma/node_modules: jsonfile
+Only in node_modules/karma/node_modules: jsonify
+Only in node_modules/karma/node_modules: jsonparse
+Only in node_modules/karma/node_modules: json-parse-better-errors
+Only in node_modules/karma/node_modules: json-parse-even-better-errors
+Only in node_modules/karma/node_modules: json-schema-traverse
+Only in node_modules/karma/node_modules: json-stable-stringify
+Only in node_modules/karma/node_modules: json-stable-stringify-without-jsonify
+Only in node_modules/karma/node_modules: JSONStream
+Only in node_modules/karma/node_modules: json-stringify-safe
+Only in node_modules/karma/node_modules: js-string-escape
+Only in node_modules/karma/node_modules: js-tokens
+Only in node_modules/karma/node_modules: js-yaml
+Only in node_modules/karma/node_modules: just-extend
+Only in node_modules/karma/node_modules: karma
+Only in node_modules/karma/node_modules: karma-browserify
+Only in node_modules/karma/node_modules: karma-browserstack-launcher
+Only in node_modules/karma/node_modules: karma-chai
+Only in node_modules/karma/node_modules: karma-chrome-launcher
+Only in node_modules/karma/node_modules: karma-firefox-launcher
+Only in node_modules/karma/node_modules: karma-jasmine
+Only in node_modules/karma/node_modules: karma-junit-reporter
+Only in node_modules/karma/node_modules: karma-mocha
+Only in node_modules/karma/node_modules: karma-mocha-reporter
+Only in node_modules/karma/node_modules: karma-script-launcher
+Only in node_modules/karma/node_modules: kind-of
+Only in node_modules/karma/node_modules: knuth-shuffle-seeded
+Only in node_modules/karma/node_modules: labeled-stream-splicer
+Only in node_modules/karma/node_modules: levn
+Only in node_modules/karma/node_modules: lines-and-columns
+Only in node_modules/karma/node_modules: linkedlist
+Only in node_modules/karma/node_modules: load-json-file
+Only in node_modules/karma/node_modules: locate-path
+Only in node_modules/karma/node_modules: lodash
+Only in node_modules/karma/node_modules: lodash.capitalize
+Only in node_modules/karma/node_modules: lodash.escaperegexp
+Only in node_modules/karma/node_modules: lodash.ismatch
+Only in node_modules/karma/node_modules: lodash.isplainobject
+Only in node_modules/karma/node_modules: lodash.isstring
+Only in node_modules/karma/node_modules: lodash.memoize
+Only in node_modules/karma/node_modules: lodash.merge
+Only in node_modules/karma/node_modules: lodash.truncate
+Only in node_modules/karma/node_modules: lodash.uniqby
+Only in node_modules/karma/node_modules: log4js
+Only in node_modules/karma/node_modules: log-symbols
+Only in node_modules/karma/node_modules: lolex
+Only in node_modules/karma/node_modules: loupe
+Only in node_modules/karma/node_modules: lower-case
+Only in node_modules/karma/node_modules: lru-cache
+Only in node_modules/karma/node_modules: map-cache
+Only in node_modules/karma/node_modules: map-obj
+Only in node_modules/karma/node_modules: map-stream
+Only in node_modules/karma/node_modules: map-visit
+Only in node_modules/karma/node_modules: marked
+Only in node_modules/karma/node_modules: marked-terminal
+Only in node_modules/karma/node_modules: md5.js
+Only in node_modules/karma/node_modules: media-typer
+Only in node_modules/karma/node_modules: meow
+Only in node_modules/karma/node_modules: merge2
+Only in node_modules/karma/node_modules: merge-descriptors
+Only in node_modules/karma/node_modules: merge-stream
+Only in node_modules/karma/node_modules: methods
+Only in node_modules/karma/node_modules: micromatch
+Only in node_modules/karma/node_modules: miller-rabin
+Only in node_modules/karma/node_modules: mime
+Only in node_modules/karma/node_modules: mime-db
+Only in node_modules/karma/node_modules: mime-types
+Only in node_modules/karma/node_modules: mimic-fn
+Only in node_modules/karma/node_modules: minimalistic-assert
+Only in node_modules/karma/node_modules: minimalistic-crypto-utils
+Only in node_modules/karma/node_modules: minimatch
+Only in node_modules/karma/node_modules: minimist
+Only in node_modules/karma/node_modules: minimist-options
+Only in node_modules/karma/node_modules: min-indent
+Only in node_modules/karma/node_modules: mixin-deep
+Only in node_modules/karma/node_modules: mkdirp
+Only in node_modules/karma/node_modules: mkdirp-classic
+Only in node_modules/karma/node_modules: mocha
+Only in node_modules/karma/node_modules: mocks
+Only in node_modules/karma/node_modules: modify-values
+Only in node_modules/karma/node_modules: module-deps
+Only in node_modules/karma/node_modules: module-not-found-error
+Only in node_modules/karma/node_modules: ms
+Only in node_modules/karma/node_modules: mz
+Only in node_modules/karma/node_modules: nanomatch
+Only in node_modules/karma/node_modules: natural-compare
+Only in node_modules/karma/node_modules: negotiator
+Only in node_modules/karma/node_modules: neo-async
+Only in node_modules/karma/node_modules: nerf-dart
+Only in node_modules/karma/node_modules: next-tick
+Only in node_modules/karma/node_modules: nise
+Only in node_modules/karma/node_modules: no-case
+Only in node_modules/karma/node_modules: node-emoji
+Only in node_modules/karma/node_modules: node-fetch
+Only in node_modules/karma/node_modules: @nodelib
+Only in node_modules/karma/node_modules: normalize-package-data
+Only in node_modules/karma/node_modules: normalize-path
+Only in node_modules/karma/node_modules: normalize-url
+Only in node_modules/karma/node_modules: npm
+Only in node_modules/karma/node_modules: npm-run-path
+Only in node_modules/karma/node_modules: null-check
+Only in node_modules/karma/node_modules: object-assign
+Only in node_modules/karma/node_modules: object.assign
+Only in node_modules/karma/node_modules: object-copy
+Only in node_modules/karma/node_modules: object-inspect
+Only in node_modules/karma/node_modules: object-keys
+Only in node_modules/karma/node_modules: object.pick
+Only in node_modules/karma/node_modules: object.values
+Only in node_modules/karma/node_modules: object-visit
+Only in node_modules/karma/node_modules: @octokit
+Only in node_modules/karma/node_modules: once
+Only in node_modules/karma/node_modules: onetime
+Only in node_modules/karma/node_modules: on-finished
+Only in node_modules/karma/node_modules: optionator
+Only in node_modules/karma/node_modules: os-browserify
+Only in node_modules/karma/node_modules: os-shim
+Only in node_modules/karma/node_modules: outpipe
+Only in node_modules/karma/node_modules: .package-lock.json
+Only in node_modules/karma/node_modules: pad-right
+Only in node_modules/karma/node_modules: pako
+Only in node_modules/karma/node_modules: parent-module
+Only in node_modules/karma/node_modules: parents
+Only in node_modules/karma/node_modules: parse-asn1
+Only in node_modules/karma/node_modules: parse-json
+Only in node_modules/karma/node_modules: parseurl
+Only in node_modules/karma/node_modules: pascalcase
+Only in node_modules/karma/node_modules: path-browserify
+Only in node_modules/karma/node_modules: path-dirname
+Only in node_modules/karma/node_modules: path-exists
+Only in node_modules/karma/node_modules: path-is-absolute
+Only in node_modules/karma/node_modules: path-key
+Only in node_modules/karma/node_modules: path-parse
+Only in node_modules/karma/node_modules: path-platform
+Only in node_modules/karma/node_modules: path-to-regexp
+Only in node_modules/karma/node_modules: path-type
+Only in node_modules/karma/node_modules: pathval
+Only in node_modules/karma/node_modules: pause-stream
+Only in node_modules/karma/node_modules: pbkdf2
+Only in node_modules/karma/node_modules: p-each-series
+Only in node_modules/karma/node_modules: pend
+Only in node_modules/karma/node_modules: p-filter
+Only in node_modules/karma/node_modules: picomatch
+Only in node_modules/karma/node_modules: pify
+Only in node_modules/karma/node_modules: p-is-promise
+Only in node_modules/karma/node_modules: pkg-conf
+Only in node_modules/karma/node_modules: p-limit
+Only in node_modules/karma/node_modules: p-locate
+Only in node_modules/karma/node_modules: p-map
+Only in node_modules/karma/node_modules: posix-character-classes
+Only in node_modules/karma/node_modules: p-reduce
+Only in node_modules/karma/node_modules: prelude-ls
+Only in node_modules/karma/node_modules: p-retry
+Only in node_modules/karma/node_modules: process
+Only in node_modules/karma/node_modules: process-nextick-args
+Only in node_modules/karma/node_modules: progress
+Only in node_modules/karma/node_modules: proxy-from-env
+Only in node_modules/karma/node_modules: proxyquire
+Only in node_modules/karma/node_modules: ps-tree
+Only in node_modules/karma/node_modules: p-try
+Only in node_modules/karma/node_modules: public-encrypt
+Only in node_modules/karma/node_modules: punycode
+Only in node_modules/karma/node_modules: puppeteer
+Only in node_modules/karma/node_modules: q
+Only in node_modules/karma/node_modules: qjobs
+Only in node_modules/karma/node_modules: qs
+Only in node_modules/karma/node_modules: querystring
+Only in node_modules/karma/node_modules: querystring-es3
+Only in node_modules/karma/node_modules: queue-microtask
+Only in node_modules/karma/node_modules: quick-lru
+Only in node_modules/karma/node_modules: randombytes
+Only in node_modules/karma/node_modules: randomfill
+Only in node_modules/karma/node_modules: range-parser
+Only in node_modules/karma/node_modules: raw-body
+Only in node_modules/karma/node_modules: rc
+Only in node_modules/karma/node_modules: readable-stream
+Only in node_modules/karma/node_modules: readdirp
+Only in node_modules/karma/node_modules: read-only-stream
+Only in node_modules/karma/node_modules: read-pkg
+Only in node_modules/karma/node_modules: read-pkg-up
+Only in node_modules/karma/node_modules: redent
+Only in node_modules/karma/node_modules: redeyed
+Only in node_modules/karma/node_modules: regenerator-runtime
+Only in node_modules/karma/node_modules: regex-not
+Only in node_modules/karma/node_modules: regexpp
+Only in node_modules/karma/node_modules: registry-auth-token
+Only in node_modules/karma/node_modules: remove-trailing-separator
+Only in node_modules/karma/node_modules: repeat-element
+Only in node_modules/karma/node_modules: repeat-string
+Only in node_modules/karma/node_modules: require-directory
+Only in node_modules/karma/node_modules: require-from-string
+Only in node_modules/karma/node_modules: requires-port
+Only in node_modules/karma/node_modules: resolve
+Only in node_modules/karma/node_modules: resolve-from
+Only in node_modules/karma/node_modules: resolve-global
+Only in node_modules/karma/node_modules: resolve-url
+Only in node_modules/karma/node_modules: ret
+Only in node_modules/karma/node_modules: retry
+Only in node_modules/karma/node_modules: reusify
+Only in node_modules/karma/node_modules: rfdc
+Only in node_modules/karma/node_modules: rimraf
+Only in node_modules/karma/node_modules: ripemd160
+Only in node_modules/karma/node_modules: run-parallel
+Only in node_modules/karma/node_modules: safe-buffer
+Only in node_modules/karma/node_modules: safer-buffer
+Only in node_modules/karma/node_modules: safe-regex
+Only in node_modules/karma/node_modules: seed-random
+Only in node_modules/karma/node_modules: @semantic-release
+Only in node_modules/karma/node_modules: semantic-release
+Only in node_modules/karma/node_modules: semver
+Only in node_modules/karma/node_modules: semver-diff
+Only in node_modules/karma/node_modules: semver-regex
+Only in node_modules/karma/node_modules: serialize-error
+Only in node_modules/karma/node_modules: setprototypeof
+Only in node_modules/karma/node_modules: set-value
+Only in node_modules/karma/node_modules: sha.js
+Only in node_modules/karma/node_modules: shasum
+Only in node_modules/karma/node_modules: shasum-object
+Only in node_modules/karma/node_modules: shebang-command
+Only in node_modules/karma/node_modules: shebang-regex
+Only in node_modules/karma/node_modules: shell-quote
+Only in node_modules/karma/node_modules: side-channel
+Only in node_modules/karma/node_modules: signale
+Only in node_modules/karma/node_modules: signal-exit
+Only in node_modules/karma/node_modules: simple-concat
+Only in node_modules/karma/node_modules: sinon
+Only in node_modules/karma/node_modules: sinon-chai
+Only in node_modules/karma/node_modules: @sinonjs
+Only in node_modules/karma/node_modules: slash
+Only in node_modules/karma/node_modules: slice-ansi
+Only in node_modules/karma/node_modules: snapdragon
+Only in node_modules/karma/node_modules: snapdragon-node
+Only in node_modules/karma/node_modules: snapdragon-util
+Only in node_modules/karma/node_modules: @socket.io
+Only in node_modules/karma/node_modules: socket.io
+Only in node_modules/karma/node_modules: socket.io-adapter
+Only in node_modules/karma/node_modules: socket.io-parser
+Only in node_modules/karma/node_modules: source-map-resolve
+Only in node_modules/karma/node_modules: source-map-url
+Only in node_modules/karma/node_modules: spawn-error-forwarder
+Only in node_modules/karma/node_modules: spdx-correct
+Only in node_modules/karma/node_modules: spdx-exceptions
+Only in node_modules/karma/node_modules: spdx-expression-parse
+Only in node_modules/karma/node_modules: spdx-license-ids
+Only in node_modules/karma/node_modules: split
+Only in node_modules/karma/node_modules: split2
+Only in node_modules/karma/node_modules: split-string
+Only in node_modules/karma/node_modules: sprintf-js
+Only in node_modules/karma/node_modules: stack-chain
+Only in node_modules/karma/node_modules: stackframe
+Only in node_modules/karma/node_modules: stack-generator
+Only in node_modules/karma/node_modules: stacktrace-gps
+Only in node_modules/karma/node_modules: stacktrace-js
+Only in node_modules/karma/node_modules: static-extend
+Only in node_modules/karma/node_modules: statuses
+Only in node_modules/karma/node_modules: stream-browserify
+Only in node_modules/karma/node_modules: stream-combiner
+Only in node_modules/karma/node_modules: stream-combiner2
+Only in node_modules/karma/node_modules: stream-http
+Only in node_modules/karma/node_modules: streamroller
+Only in node_modules/karma/node_modules: stream-splicer
+Only in node_modules/karma/node_modules: string-argv
+Only in node_modules/karma/node_modules: string_decoder
+Only in node_modules/karma/node_modules: string.prototype.trimend
+Only in node_modules/karma/node_modules: string.prototype.trimstart
+Only in node_modules/karma/node_modules: string-width
+Only in node_modules/karma/node_modules: strip-ansi
+Only in node_modules/karma/node_modules: strip-bom
+Only in node_modules/karma/node_modules: strip-final-newline
+Only in node_modules/karma/node_modules: strip-indent
+Only in node_modules/karma/node_modules: strip-json-comments
+Only in node_modules/karma/node_modules: subarg
+Only in node_modules/karma/node_modules: superagent
+Only in node_modules/karma/node_modules: supertest
+Only in node_modules/karma/node_modules: supports-color
+Only in node_modules/karma/node_modules: supports-hyperlinks
+Only in node_modules/karma/node_modules: supports-preserve-symlinks-flag
+Only in node_modules/karma/node_modules: syntax-error
+Only in node_modules/karma/node_modules: table
+Only in node_modules/karma/node_modules: temp-dir
+Only in node_modules/karma/node_modules: temp-fs
+Only in node_modules/karma/node_modules: tempy
+Only in node_modules/karma/node_modules: text-extensions
+Only in node_modules/karma/node_modules: text-table
+Only in node_modules/karma/node_modules: thenify
+Only in node_modules/karma/node_modules: thenify-all
+Only in node_modules/karma/node_modules: through
+Only in node_modules/karma/node_modules: through2
+Only in node_modules/karma/node_modules: timers-browserify
+Only in node_modules/karma/node_modules: timer-shim
+Only in node_modules/karma/node_modules: title-case
+Only in node_modules/karma/node_modules: tmp
+Only in node_modules/karma/node_modules: toidentifier
+Only in node_modules/karma/node_modules: to-object-path
+Only in node_modules/karma/node_modules: @tootallnate
+Only in node_modules/karma/node_modules: to-regex
+Only in node_modules/karma/node_modules: to-regex-range
+Only in node_modules/karma/node_modules: tr46
+Only in node_modules/karma/node_modules: traverse
+Only in node_modules/karma/node_modules: trim-newlines
+Only in node_modules/karma/node_modules: tsconfig-paths
+Only in node_modules/karma/node_modules: tty-browserify
+Only in node_modules/karma/node_modules: type
+Only in node_modules/karma/node_modules: type-check
+Only in node_modules/karma/node_modules: typedarray
+Only in node_modules/karma/node_modules: type-detect
+Only in node_modules/karma/node_modules: type-fest
+Only in node_modules/karma/node_modules: type-is
+Only in node_modules/karma/node_modules: @types
+Only in node_modules/karma/node_modules: ua-parser-js
+Only in node_modules/karma/node_modules: uglify-js
+Only in node_modules/karma/node_modules: umd
+Only in node_modules/karma/node_modules: unbox-primitive
+Only in node_modules/karma/node_modules: undeclared-identifiers
+Only in node_modules/karma/node_modules: union-value
+Only in node_modules/karma/node_modules: unique-string
+Only in node_modules/karma/node_modules: universalify
+Only in node_modules/karma/node_modules: universal-user-agent
+Only in node_modules/karma/node_modules: unpipe
+Only in node_modules/karma/node_modules: unset-value
+Only in node_modules/karma/node_modules: upath
+Only in node_modules/karma/node_modules: upper-case
+Only in node_modules/karma/node_modules: uri-js
+Only in node_modules/karma/node_modules: urix
+Only in node_modules/karma/node_modules: url
+Only in node_modules/karma/node_modules: url-join
+Only in node_modules/karma/node_modules: use
+Only in node_modules/karma/node_modules: util
+Only in node_modules/karma/node_modules: util-arity
+Only in node_modules/karma/node_modules: util-deprecate
+Only in node_modules/karma/node_modules: utils-merge
+Only in node_modules/karma/node_modules: v8-compile-cache
+Only in node_modules/karma/node_modules: validate-npm-package-license
+Only in node_modules/karma/node_modules: vary
+Only in node_modules/karma/node_modules: verror
+Only in node_modules/karma/node_modules: vm-browserify
+Only in node_modules/karma/node_modules: void-elements
+Only in node_modules/karma/node_modules: watchify
+Only in node_modules/karma/node_modules: webidl-conversions
+Only in node_modules/karma/node_modules: whatwg-url
+Only in node_modules/karma/node_modules: which
+Only in node_modules/karma/node_modules: which-boxed-primitive
+Only in node_modules/karma/node_modules: word-wrap
+Only in node_modules/karma/node_modules: wordwrap
+Only in node_modules/karma/node_modules: wrap-ansi
+Only in node_modules/karma/node_modules: wrappy
+Only in node_modules/karma/node_modules: ws
+Only in node_modules/karma/node_modules: xmlbuilder
+Only in node_modules/karma/node_modules: xregexp
+Only in node_modules/karma/node_modules: xtend
+Only in node_modules/karma/node_modules: y18n
+Only in node_modules/karma/node_modules: yallist
+Only in node_modules/karma/node_modules: yaml
+Only in node_modules/karma/node_modules: yargs
+Only in node_modules/karma/node_modules: yargs-parser
+Only in node_modules/karma/node_modules: yauzl
+Only in node_modules/karma/node_modules: yocto-queue
+Only in node_modules/karma: package-lock.json
+diff --git node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-local-wd-launcher/index.js
+index 547a435..710ee13 100644
+--- node_modules/karma-local-wd-launcher.orig/index.js
++++ node_modules/karma-local-wd-launcher/index.js
+@@ -112,13 +112,27 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
    // properly, we need to reimplement all the methods that could trigger a
    // 'kill' event.
    this.kill = async () => {
@@ -206,15 +908,26 @@ diff -ur node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-l
 +console.log('karma-local-wd-launcher kill complete', this.state);
    };
  
++  this.forceKillOperation_ = null;
++
    this.forceKill = async () => {
++    if (this.state == 'BEING_FORCE_KILLED') {
++console.log('karma-local-wd-launcher forceKill delegate', this.state);
++      return this.forceKillOperation_.then(() => {
++console.log('karma-local-wd-launcher forceKill delegate complete', this.state);
++      });
++    }
++
 +console.log('karma-local-wd-launcher forceKill', this.state);
      this.state = 'BEING_FORCE_KILLED';
-     await this.stopWebdriver_();
+-    await this.stopWebdriver_();
++    this.forceKillOperation_ = this.stopWebdriver_();
++    await this.forceKillOperation_;
 +console.log('karma-local-wd-launcher forceKill complete', this.state);
    };
  
    const originalStart = this.start;
-@@ -161,6 +165,7 @@
+@@ -161,6 +175,7 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
      if (this.state == 'BEING_FORCE_KILLED') {
        return;
      }
@@ -222,7 +935,7 @@ diff -ur node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-l
  
      this.state = 'RESTARTING';
      await this.stopWebdriver_();
-@@ -169,16 +174,21 @@
+@@ -169,18 +184,26 @@ const LocalWebDriverBase = function(baseBrowserDecorator, args, logger) {
        log.debug(`Restarting ${this.name}`)
        this.start(previousUrl);
      }
@@ -230,6 +943,8 @@ diff -ur node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-l
    };
  
    this.stopWebdriver_ = async () => {
++console.log('karma-local-wd-launcher stopWebdriver_', this.state);
++
      if (this.browser) {
 +console.log('karma-local-wd-launcher stop session', this.state);
        await new Promise(resolve => this.browser.quit(resolve));
@@ -243,5 +958,7 @@ diff -ur node_modules/karma-local-wd-launcher.orig/index.js node_modules/karma-l
 +console.log('karma-local-wd-launcher emit kill complete', this.state);
  
      this.state = 'FINISHED';
++console.log('karma-local-wd-launcher stopWebdriver_ complete', this.state);
    };
-Only in node_modules/karma-local-wd-launcher: .index.js.swp
+ }
+ 
