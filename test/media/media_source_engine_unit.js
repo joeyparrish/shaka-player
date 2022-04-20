@@ -287,7 +287,7 @@ describe('MediaSourceEngine', () => {
       audioSourceBuffer.buffered = createFakeBuffered([{start: 0, end: 10}]);
 
       expect(mediaSourceEngine.bufferedAheadOf(ContentType.AUDIO, 0))
-          .toBeCloseTo(10);
+          .toBe(Infinity);
       expect(mediaSourceEngine.bufferedAheadOf(ContentType.AUDIO, 5))
           .toBeCloseTo(5);
       expect(mediaSourceEngine.bufferedAheadOf(ContentType.AUDIO, 9.9))
