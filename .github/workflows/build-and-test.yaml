@@ -110,7 +110,8 @@ jobs:
 
           python build/test.py \
             --browsers "$browser" \
-            --reporters spec --spec-hide-passed \
+            --reporters spec github-actions \
+            --spec-hide-passed \
             --drm \
             ${{ matrix.extra_flags }}
 
