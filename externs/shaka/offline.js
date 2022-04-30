@@ -348,6 +348,15 @@ shaka.extern.StorageCell = class {
   getSegments(keys) {}
 
   /**
+   * Get all segment keys stored in this cell. Since this is only the keys and
+   * not the segment data, it is assumed that it is feasible to have them
+   * all in main memory at one time.
+   *
+   * @return {!Promise.<!Array.<number>>}
+   */
+  getAllSegmentKeys() {}
+
+  /**
    * Add a group of manifests. Will return a promise that resolves with a list
    * of keys for each manifest. If one manifest fails to be added, all manifests
    * should fail to be added.
