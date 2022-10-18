@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.2.14](https://github.com/joeyparrish/shaka-player/compare/v3.2.13...v3.2.14) (2022-10-18)
+
+
+### Bug Fixes
+
+* **offline:** Add storage muxer init timeout ([#4566](https://github.com/joeyparrish/shaka-player/issues/4566)) ([251533c](https://github.com/joeyparrish/shaka-player/commit/251533c7feda9d474d779e3d8f70489d0413f917))
+
 ## [3.2.13](https://github.com/shaka-project/shaka-player/compare/v3.2.12...v3.2.13) (2022-10-07)
 
 
