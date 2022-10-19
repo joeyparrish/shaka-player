@@ -83,9 +83,16 @@ jobs:
       # the environment used by GitHub actions, so make sure that ffmpeg is
       # installed. Otherwise, the browser might not support some codecs that the
       # tests assume will be supported.
-      - name: Install FFmpeg
+      # Also, starting with the ubuntu-22.04 image, it appears that we have to
+      # install Firefox explicitly from a PPA.  There is no longer an official
+      # Ubuntu package available.
+      - name: Install Firefox and deps
         if: matrix.os == 'ubuntu-latest' && matrix.browser == 'Firefox'
-        run: sudo apt -y update && sudo apt -y install ffmpeg
+        run: |
+          sudo add-apt-repository ppa:mozillateam/ppa
+          sudo apt -y update
+          sudo apt -y install ffmpeg
+          sudo apt -y install firefox -t 'o=LP-PPA-mozillateam'
 
       - name: Checkout code
         uses: actions/checkout@v2
