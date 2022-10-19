@@ -46,7 +46,7 @@ jobs:
           - os: ubuntu-latest
             browser: Chrome
             extra_flags: "--use-xvfb --html-coverage-report --uncompiled"
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             browser: Firefox
             extra_flags: "--use-xvfb"
           - os: ubuntu-latest
@@ -87,7 +87,7 @@ jobs:
       # install Firefox explicitly from a PPA.  There is no longer an official
       # Ubuntu package available.
       - name: Install Firefox and deps
-        if: matrix.os == 'ubuntu-latest' && matrix.browser == 'Firefox'
+        if: matrix.os == 'ubuntu-22.04' && matrix.browser == 'Firefox'
         run: |
           sudo add-apt-repository ppa:mozillateam/ppa
           sudo apt -y update
