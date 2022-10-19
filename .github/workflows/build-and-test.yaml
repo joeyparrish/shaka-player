@@ -46,7 +46,7 @@ jobs:
           - os: ubuntu-latest
             browser: Chrome
             extra_flags: "--use-xvfb --html-coverage-report --uncompiled"
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             browser: Firefox
             extra_flags: "--use-xvfb"
           - os: ubuntu-latest
