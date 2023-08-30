@@ -1,0 +1,48 @@
+name: Talk to Shaka Bot (PRs)
+
+# Runs when comments are created or edited.  Jobs below will be filtered to
+# only run on PRs, not regular issues.
+on:
+  issue_comment:
+    types: [created, edited]
+
+jobs:
+  read_comment:
+    # Only runs on PRs
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: [ubuntu-latest]
+    env:
+      # This token must have `repo` scope.
+      GH_TOKEN: ${{ secrets.SHAKA_BOT_TOKEN }}
+    steps:
+      - name: Show help
+        if: contains(github.event.comment.body, '@shaka-bot help')
+        run: |
+          COMMENTER="${{ github.event.comment.user.login }}"
+          PR_NUMBER="${{ github.event.issue }}"
+          echo "PR $PR_NUMBER, help command"
+
+          (
+            echo "@$COMMENTER: I understand the following commands:"
+            echo " - help: Show this help message"
+            echo " - test: Start lab tests (maintainers only)"
+          ) | gh issue comment "${{ github.event.issue }}" -F -
+
+      - name: Start lab tests
+        if: contains(github.event.comment.body, '@shaka-bot test')
+        run: |
+          THIS_REPO="${{ github.repository }}"
+          COMMENTER="${{ github.event.comment.user.login }}"
+          PR_NUMBER="${{ github.event.issue }}"
+          echo "PR $PR_NUMBER, test command"
+
+          # Check permissions: this API call fails if the user has no special
+          # permissions on the repo.
+          if gh api "/repos/$THIS_REPO/collaborators/$COMMENTER"; then
+            gh workflow run selenium-lab-tests.yaml -f "pr=$PR_NUMBER"
+            echo "@$COMMENTER: Lab tests started." | \
+              gh issue comment "${{ github.event.issue }}" -F -
+          else
+            echo "@$COMMENTER: Only maintainers may start lab tests." | \
+              gh issue comment "${{ github.event.issue }}" -F -
+          fi
