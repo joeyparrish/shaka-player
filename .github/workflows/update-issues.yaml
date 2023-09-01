@@ -23,7 +23,7 @@ jobs:
 
       - name: Update Issues
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SHAKA_BOT_TOKEN }}
         run: |
           cd update-issues
           npm ci
