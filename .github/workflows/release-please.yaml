@@ -103,9 +103,9 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      #- run: npm publish
+      #  env:
+      #    NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - run: npm pack
       - uses: svenstaro/upload-release-action@483c1e56f95e88835747b1c7c60581215016cbf2
@@ -159,15 +159,15 @@ jobs:
 
       - uses: ./.github/workflows/custom-actions/prep-for-appspot
 
-      - uses: google-github-actions/auth@v0
-        with:
-          credentials_json: '${{ secrets.APPENGINE_DEPLOY_KEY }}'
+      #- uses: google-github-actions/auth@v0
+      #  with:
+      #    credentials_json: '${{ secrets.APPENGINE_DEPLOY_KEY }}'
 
-      - uses: google-github-actions/deploy-appengine@v0
-        with:
-          project_id: shaka-player-demo
-          version: ${{ env.APPSPOT_SUBDOMAIN }}
-          promote: ${{ env.APPSPOT_PROMOTE }}
+      #- uses: google-github-actions/deploy-appengine@v0
+      #  with:
+      #    project_id: shaka-player-demo
+      #    version: ${{ env.APPSPOT_SUBDOMAIN }}
+      #    promote: ${{ env.APPSPOT_PROMOTE }}
 
   auto-branch:
     runs-on: ubuntu-latest
