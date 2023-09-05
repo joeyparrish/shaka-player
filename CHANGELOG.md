@@ -1,5 +1,28 @@
 # Changelog
 
+## [4.5.0](https://github.com/joeyparrish/shaka-player/compare/v4.4.0...v4.5.0) (2023-09-05)
+
+
+### Features
+
+* Add manifestupdated event ([#5602](https://github.com/joeyparrish/shaka-player/issues/5602)) ([b16d2f0](https://github.com/joeyparrish/shaka-player/commit/b16d2f0bf3691ef7cc2de4eea095df21814a2027))
+
+
+### Bug Fixes
+
+* com.apple.fps should work with the default initDataTransform when using legacy Apple Media Keys ([#5603](https://github.com/joeyparrish/shaka-player/issues/5603)) ([76fdda6](https://github.com/joeyparrish/shaka-player/commit/76fdda65231905c945db6a5eedeece65f8d7711e))
+* **Demo:** Allow com.apple.fps.1_0 in the custom DRM System field ([#5600](https://github.com/joeyparrish/shaka-player/issues/5600)) ([ab86000](https://github.com/joeyparrish/shaka-player/commit/ab86000dc75a352505875fe6dbc37fe0bdd2857a))
+* Fix MediaSourceEngine reset operation ([#5576](https://github.com/joeyparrish/shaka-player/issues/5576)) ([9f5e91f](https://github.com/joeyparrish/shaka-player/commit/9f5e91f4a37a8e504adcf1dd756fac9c777c2051))
+* Fix Mp4Generator ([#5566](https://github.com/joeyparrish/shaka-player/issues/5566)) ([effafbc](https://github.com/joeyparrish/shaka-player/commit/effafbc849cc83c732fe113f5da479513b884f9f))
+* Fix PES parsing ([#5559](https://github.com/joeyparrish/shaka-player/issues/5559)) ([5c6ab9e](https://github.com/joeyparrish/shaka-player/commit/5c6ab9e0c8ba1236710209b36ea08d7a44fb1bf3))
+* fix preferred track selection on Safari ([#5601](https://github.com/joeyparrish/shaka-player/issues/5601)) ([d021d6f](https://github.com/joeyparrish/shaka-player/commit/d021d6f932b3a64d826b919b5a7b252599e2ecd5))
+* Fix transmuxed audio timestamps ([#5595](https://github.com/joeyparrish/shaka-player/issues/5595)) ([0260aef](https://github.com/joeyparrish/shaka-player/commit/0260aefcdbdda2184ea32d3d8678a04491cc6fd3))
+* Fix TS transmuxer when the main content is muxed ([#5575](https://github.com/joeyparrish/shaka-player/issues/5575)) ([65b3037](https://github.com/joeyparrish/shaka-player/commit/65b3037181b30274b1cedf52283f5726cf7df0b9))
+* **HLS:** Allow audio groups on audio-only content ([#5578](https://github.com/joeyparrish/shaka-player/issues/5578)) ([3cbc444](https://github.com/joeyparrish/shaka-player/commit/3cbc444c95ab2e8c124d2caaaac6ce7bc5fdf02f))
+* **HLS:** Get the correct video codec for TS segments ([#5598](https://github.com/joeyparrish/shaka-player/issues/5598)) ([1135115](https://github.com/joeyparrish/shaka-player/commit/11351150694814813cb1cfeab4dc78fdefcce6fa))
+* Prevent codecs override in the transmuxer ([#5568](https://github.com/joeyparrish/shaka-player/issues/5568)) ([66c625f](https://github.com/joeyparrish/shaka-player/commit/66c625f55ab00989ff74419e8f85ca7619446dd0))
+* Remove debugging code on Simple Text ([#5582](https://github.com/joeyparrish/shaka-player/issues/5582)) ([991130a](https://github.com/joeyparrish/shaka-player/commit/991130a6d875fd41ff585254563c5a879057603a))
+
 ## [4.4.0](https://github.com/shaka-project/shaka-player/compare/v4.4.0...v4.4.0) (2023-08-30)
 
 
