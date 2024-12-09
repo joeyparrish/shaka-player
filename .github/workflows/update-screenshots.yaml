@@ -29,6 +29,11 @@ jobs:
     name: Set Pending Status
     needs: compute-sha
     runs-on: ubuntu-latest
+
+    permissions:
+      # "Write" to statuses to update commit status
+      statuses: write
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -107,6 +112,11 @@ jobs:
   set-final-status:
     name: Set Final Status
     runs-on: ubuntu-latest
+
+    permissions:
+      # "Write" to statuses to update commit status
+      statuses: write
+
     needs: [compute-sha, run-lab-tests, update-pr]
     # Will run on success or failure, but not if the workflow is cancelled.
     if: ${{ success() || failure() }}
