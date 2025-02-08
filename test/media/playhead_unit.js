@@ -101,11 +101,21 @@ describe('Playhead', () => {
   /** @type {!jasmine.Spy} */
   let onEvent;
 
+  let originalSupportsInfiniteDuration;
+  /** @type {!jasmine.Spy} */
+  let supportsInfiniteDuration;
+
   beforeAll(() => {
     jasmine.clock().install();
+
+    originalSupportsInfiniteDuration =
+        shaka.media.Capabilities.isInfiniteLiveStreamDurationSupported;
   });
 
   afterAll(() => {
+    shaka.media.Capabilities.isInfiniteLiveStreamDurationSupported =
+        originalSupportsInfiniteDuration;
+
     jasmine.clock().uninstall();
   });
 
@@ -144,6 +154,15 @@ describe('Playhead', () => {
     };
 
     config = shaka.util.PlayerConfiguration.createDefault().streaming;
+
+    // By default, pretend we don't have support for setLiveSeekableRange,
+    // because we are frequently testing the seeking behavior of Playhead that
+    // is only enabled in this case.
+    supportsInfiniteDuration = jasmine.createSpy(
+        'isInfiniteLiveStreamDurationSupported');
+    shaka.media.Capabilities.isInfiniteLiveStreamDurationSupported =
+        shaka.test.Util.spyFunc(supportsInfiniteDuration);
+    supportsInfiniteDuration.and.returnValue(false);
   });
 
   afterEach(() => {
