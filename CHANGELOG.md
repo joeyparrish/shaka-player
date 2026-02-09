@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.99.3](https://github.com/joeyparrish/shaka-player/compare/v4.99.2...v4.99.3) (2026-02-09)
+
+
+### Bug Fixes
+
+* **ci:** Fix npm pack output ([dd07292](https://github.com/joeyparrish/shaka-player/commit/dd07292587a919cbc4e17506d0a7f4e9f63549b9))
+
 ## [4.99.2](https://github.com/joeyparrish/shaka-player/compare/v4.99.0...v4.99.2) (2026-02-09)
 
 
