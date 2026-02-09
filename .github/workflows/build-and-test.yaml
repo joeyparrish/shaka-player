@@ -39,7 +39,7 @@ jobs:
           java-version: 21
 
       - name: Lint
-        run: python3 build/check.py
+        run: PRINT_ARGUMENTS=1 python3 build/check.py
 
   build_and_test:
     # Don't waste time doing a full matrix of test runs when there was an
