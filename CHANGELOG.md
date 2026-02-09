@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.99.1](https://github.com/joeyparrish/shaka-player/compare/v4.99.0...v4.99.1) (2026-02-09)
+
+
+### Bug Fixes
+
+* **ci:** Print arguments during lint ([a118b34](https://github.com/joeyparrish/shaka-player/commit/a118b3477d80593a21951f6b284cf78ea17c7236))
+
 ## [4.99.0](https://github.com/shaka-project/shaka-player/compare/v4.16.0...v5.0.0) (2026-02-06)
 
 
