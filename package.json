@@ -103,7 +103,7 @@
   "types": "dist/shaka-player.compiled.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/shaka-project/shaka-player.git"
+    "url": "https://github.com/joeyparrish/shaka-player"
   },
   "bugs": {
     "url": "https://github.com/shaka-project/shaka-player/issues"
