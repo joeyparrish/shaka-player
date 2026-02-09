@@ -1,6 +1,6 @@
 # Changelog
 
-## [5.0.0](https://github.com/shaka-project/shaka-player/compare/v4.16.0...v5.0.0) (2026-02-06)
+## [4.99.0](https://github.com/shaka-project/shaka-player/compare/v4.16.0...v5.0.0) (2026-02-06)
 
 
 ### ⚠ BREAKING CHANGES
