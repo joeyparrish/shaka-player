@@ -13,6 +13,13 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
       patch: ${{ steps.release.outputs.patch }}
+
+    permissions:
+      # Write to "contents" is needed to create a release
+      contents: write
+      # Write to pull-requests is needed to create and update the release PR
+      pull-requests: write
+
     steps:
       # Create/update release PR
       - uses: googleapis/release-please-action@v4
@@ -58,6 +65,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: release
     if: needs.release.outputs.release_created
+
+    permissions:
+      # Required for OIDC ("trusted publishing")
+      id-token: write
+      # Write to "contents" is needed to attach files to the release
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,15 +79,20 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          registry-url: 'https://registry.npmjs.org'
-
       - uses: actions/setup-java@v4
         with:
           distribution: zulu
           java-version: 21
+
+      - uses: actions/setup-node@v4
+        with:
+          # NOTE: OIDC fails with node less than 24.
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      # NOTE: OIDC fails with npm less than 11.5.1.
+      - name: Update npm
+        run: sudo npm install -g npm@11.7
 
       - name: Compute NPM tags
         run: |
@@ -109,12 +128,16 @@ jobs:
           echo "NPM latest: $NPM_LATEST"
 
       - run: npm ci
+
+      # NOTE: OIDC fails if the repository URL doesn't match package.json, but
+      # Shaka Player's prepublish checks will reject any local changes beyond
+      # the tag.  So if you fork this package, update repository.url in
+      # package.json to match.
       - name: Publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         run: |
           # Publish with an explicit tag.
-          npm publish --tag "$NPM_TAG"
+          # NOTE: --access public is required for scoped forks.
+          npm publish --tag "$NPM_TAG" --access public
 
           # Add the "latest" tag if needed.
           if [[ "$NPM_LATEST" == "true" ]]; then
@@ -122,15 +145,14 @@ jobs:
             npm dist-tag add "shaka-player@$NPM_VERSION" latest
           fi
 
-      - run: npm pack
+      # Stores the file name into the file "tarball" (unpredictable for forks).
+      - run: npm pack > tarball
 
       - name: Attach to release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-        run: |
-          gh release upload \
-              ${{ needs.release.outputs.tag_name }} shaka-player-*.tgz \
-              --clobber
+        # Reads the file name from the file "tarball".
+        run: gh release upload --clobber "${{ needs.release.outputs.tag_name }}" "$(cat tarball)"
 
   appspot:
     runs-on: ubuntu-latest
