@@ -162,8 +162,8 @@ jobs:
 
           # Add the "latest" tag if needed.
           if [[ "$NPM_LATEST" == "true" ]]; then
-            NPM_VERSION=$(npm version --json | jq -r '."shaka-player"')
-            npm dist-tag add "shaka-player@$NPM_VERSION" latest
+            NPM_VERSION=$(jq -r .version < package.json)
+            npm dist-tag add "${{ steps.extract-name.outputs.name }}@$NPM_VERSION" latest
           fi
 
       # Stores the file name into the file "tarball" (unpredictable for forks).
