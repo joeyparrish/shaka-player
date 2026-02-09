@@ -167,7 +167,7 @@ jobs:
           fi
 
       # Stores the file name into the file "tarball" (unpredictable for forks).
-      - run: npm pack > tarball
+      - run: npm pack --ignore-scripts > tarball
 
       - name: Attach to release
         env:
