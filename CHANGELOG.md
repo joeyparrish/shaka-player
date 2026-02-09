@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.99.5](https://github.com/joeyparrish/shaka-player/compare/v4.99.4...v4.99.5) (2026-02-09)
+
+
+### Bug Fixes
+
+* **ci:** Fix hard-coded package names ([464474b](https://github.com/joeyparrish/shaka-player/commit/464474b01a58d398be6683e3e12f72071c0fcfd2))
+
 ## [4.99.4](https://github.com/joeyparrish/shaka-player/compare/v4.99.3...v4.99.4) (2026-02-09)
 
 
