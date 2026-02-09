@@ -129,6 +129,25 @@ jobs:
 
       - run: npm ci
 
+      # Because we want to use the package name as an input to a canned action,
+      # and we want to make this workflow easier to test in a fork with a
+      # forked package name, extract the package name here instead of
+      # hard-coding it.  Making it an output makes it available to the context
+      # of the next step before it is evaluated.
+      - name: Extract package name
+        id: extract-name
+        run: |
+          name=$(jq -r .name < package.json)
+          echo "name=$name" >> $GITHUB_OUTPUT
+
+      # NPM doesn't allow the direct use of OIDC for npm dist-tag, only for npm
+      # publish.  Since we need dist-tag, this action will help us exchange the
+      # OIDC token for a standard NPM token that works for both commands.
+      # See this discussion for details: https://github.com/npm/cli/issues/8547
+      - uses: electron/npm-trusted-auth-action@418d14975a3ff06683cc4580a4eba437f0f017f1
+        with:
+          package-name: '${{ steps.extract-name.outputs.name }}'
+
       # NOTE: OIDC fails if the repository URL doesn't match package.json, but
       # Shaka Player's prepublish checks will reject any local changes beyond
       # the tag.  So if you fork this package, update repository.url in
