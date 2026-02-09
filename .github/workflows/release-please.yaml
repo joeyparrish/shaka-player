@@ -135,6 +135,8 @@ jobs:
       # package.json to match.
       - name: Publish
         run: |
+          set -x
+
           # Publish with an explicit tag.
           # NOTE: --access public is required for scoped forks.
           npm publish --tag "$NPM_TAG" --access public
