@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.99.2](https://github.com/joeyparrish/shaka-player/compare/v4.99.0...v4.99.2) (2026-02-09)
+
+
+### Bug Fixes
+
+* **ci:** Debug npm workflow ([605368c](https://github.com/joeyparrish/shaka-player/commit/605368c69151a2f51bbe7febac940d0891b8c4d4))
+* **ci:** Update release for trusted publishing ([9238dc4](https://github.com/joeyparrish/shaka-player/commit/9238dc499a591480ae01d16f6fb63f00252ab9fc)), closes [#9132](https://github.com/joeyparrish/shaka-player/issues/9132)
+* **ci:** Use action to convert OIDC to standard token ([0e87dba](https://github.com/joeyparrish/shaka-player/commit/0e87dba41a5e21d2302cb60b708865f2dd7554f8))
+
 ## [4.99.0](https://github.com/shaka-project/shaka-player/compare/v4.16.0...v5.0.0) (2026-02-06)
 
 
