@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.99.8](https://github.com/joeyparrish/shaka-player/compare/v4.99.7...v4.99.8) (2026-02-10)
+
+
+### Bug Fixes
+
+* **ci:** Try another env var name ([9b18920](https://github.com/joeyparrish/shaka-player/commit/9b18920fc5ed1018b7334736462bcd9fd9a689ac))
+
 ## [4.99.7](https://github.com/joeyparrish/shaka-player/compare/v4.99.6...v4.99.7) (2026-02-10)
 
 
