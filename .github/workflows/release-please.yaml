@@ -163,6 +163,7 @@ jobs:
           # Add the "latest" tag if needed.
           if [[ "$NPM_LATEST" == "true" ]]; then
             NPM_VERSION=$(jq -r .version < package.json)
+            export NODE_AUTH_TOKEN="$NPM_TOKEN"
             npm dist-tag add "${{ steps.extract-name.outputs.name }}@$NPM_VERSION" latest
           fi
 
