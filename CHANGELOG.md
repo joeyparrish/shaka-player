@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.99.20](https://github.com/joeyparrish/shaka-player/compare/v4.99.7...v4.99.20) (2026-02-26)
+
+
+### Bug Fixes
+
+* **ci:** Drop branch tags ([68eff9a](https://github.com/joeyparrish/shaka-player/commit/68eff9a21b43398ac2def4d64fee0ccad6da08d7))
+* **ci:** Try another env var name ([9b18920](https://github.com/joeyparrish/shaka-player/commit/9b18920fc5ed1018b7334736462bcd9fd9a689ac))
+
 ## [4.99.7](https://github.com/joeyparrish/shaka-player/compare/v4.99.6...v4.99.7) (2026-02-10)
 
 
