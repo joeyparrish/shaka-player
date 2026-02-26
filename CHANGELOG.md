@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.99.21](https://github.com/joeyparrish/shaka-player/compare/v4.99.20...v4.99.21) (2026-02-26)
+
+
+### Bug Fixes
+
+* **ci:** Drop electron workflow mess ([5f87608](https://github.com/joeyparrish/shaka-player/commit/5f87608e19166457bd38b5c2078a898f1d13d5ad))
+* **ci:** Simplify ([97b285c](https://github.com/joeyparrish/shaka-player/commit/97b285c8396a410f9ea8a418de633e73ad9c00e1))
+
 ## [4.99.20](https://github.com/joeyparrish/shaka-player/compare/v4.99.7...v4.99.20) (2026-02-26)
 
 
