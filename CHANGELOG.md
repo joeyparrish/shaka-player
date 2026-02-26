@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.99.10](https://github.com/joeyparrish/shaka-player/compare/v4.99.9...v4.99.10) (2026-02-26)
+
+
+### Bug Fixes
+
+* **ci:** Revert "Simplify" ([6f82b68](https://github.com/joeyparrish/shaka-player/commit/6f82b688673bfe6a2511189f371619f3c11ddf47))
+
 ## [4.99.9](https://github.com/joeyparrish/shaka-player/compare/v4.99.8...v4.99.9) (2026-02-26)
 
 
