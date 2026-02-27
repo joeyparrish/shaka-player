@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.99.22](https://github.com/joeyparrish/shaka-player/compare/v4.99.10...v4.99.22) (2026-02-27)
+
+
+### Bug Fixes
+
+* **ci:** Empty ([e1cfded](https://github.com/joeyparrish/shaka-player/commit/e1cfdedefc3d4a68f6bfdfc5e8f7db848da8a889))
+
 ## [4.99.10](https://github.com/joeyparrish/shaka-player/compare/v4.99.9...v4.99.10) (2026-02-26)
 
 
