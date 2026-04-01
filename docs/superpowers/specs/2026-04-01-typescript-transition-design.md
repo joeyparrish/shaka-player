@@ -38,9 +38,10 @@ To maintain a type-safe, optimized project throughout the transition, we will ad
 
 1.  **Prerequisite**: All 300+ files must be fully converted to `goog.module`.
 2.  **Automated ES Module Conversion**: Because `goog.module` semantics directly map to standard ES modules, perform an automated codebase-wide translation from `goog.module` to standard ES `import` and `export` statements.
-3.  **Implement Modern Bundler**: Introduce Rollup/ESBuild to bundle the newly created ES Modules. Closure Compiler's dependency management is no longer required.
-3.  **Replicate Build Variants**: Configure the bundler to output the exact same artifact family (`+@complete`, `-@ui`, etc.) and preserve the `window.shaka` global IIFE wrapper.
-4.  **Validation**: Run the full suite of integration tests and Demo app checks against the *new* bundles to prove absolute API and runtime compatibility.
+3.  **Top-Level API Exports**: Because we lose `goog.module.declareLegacyNamespace()`, we must explicitly create a top-level entry point (e.g., `index.js`) that imports and re-exports the entire public API to maintain the global `window.shaka` namespace.
+4.  **Implement Modern Bundler**: Introduce Rollup/ESBuild to bundle the newly created ES Modules using the new top-level entry point. Closure Compiler's dependency management is no longer required.
+5.  **Replicate Build Variants**: Configure the bundler to output the exact same artifact family (`+@complete`, `-@ui`, etc.) and preserve the `window.shaka` global IIFE wrapper.
+6.  **Validation**: Run the full suite of integration tests and Demo app checks against the *new* bundles to prove absolute API and runtime compatibility.
 
 ## Phase 3: Syntactic Sugar & Final Migration
 **Goal:** Convert the `.js` + JSDoc codebase to native `.ts` syntax.
