@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/** Width and height in pixels. */
 export interface Resolution {
+  /** Width in pixels. */
   width: number;
+  /** Height in pixels. */
   height: number;
 }

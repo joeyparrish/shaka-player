@@ -214,21 +214,14 @@ The original `shaka.util.Timer` becomes:
 ## Comments Format
 
 ### Comment Philosophy
-Comments must earn their place. A comment that restates the code is noise — remove it. A comment that explains *why* something non-obvious exists is valuable — keep it.
+Migrate all descriptive comments from the source. If the original has a comment, the conversion has it. This is part of Rule #0 — translate, don't transform.
 
-**Do not comment:**
-- Names that repeat the declaration (`/** Timer. */ export class Timer`)
-- Self-explanatory properties (`/** Width in pixels. */ width: number` on a `Resolution` interface)
-- Obvious logic or standard patterns
+**Do not add** comments that don't exist in the source. Do not invent new descriptions.
 
-**Do comment:**
-- Non-obvious behavior or edge cases
-- Complex algorithms or business logic that isn't clear from the code
-- Why a particular approach was chosen over the obvious one
-- `// MIGRATION:` deviations (see below)
+**Do remove** comments that only restate the declaration name with no additional information (`/** Timer. */ export class Timer`, `/** MPEG_PES. */ export interface MPEG_PES`).
 
 ### Multi-line JSDoc Comments
-Use `/** ... */` for function and class descriptions only when they add value beyond the name and signature. Max 80 characters per line:
+Use `/** ... */` for function, class, and property descriptions migrated from the source. Max 80 characters per line:
 
 ```typescript
 /**
