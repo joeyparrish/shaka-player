@@ -29,12 +29,22 @@ Key principles:
 - If something goes sideways, STOP and re-plan immediately
 - Commit between each task during plan execution
 - Commit the plan file itself after all tasks are complete
+- Before starting any migration step, check `ts/migration/FORWARD_DECLARATIONS.md`
+  for forward declarations that should be resolved in that step
 
 ### Subagent Strategy
 
 - Use subagents liberally to keep main context window clean
 - Offload research, exploration, and parallel analysis
 - For complex problems, throw more compute at it via subagents
+
+### Commands
+
+All commands run from the `ts/` directory:
+
+- `npm run check` — type-check without emitting (`tsc --noEmit`)
+- `npm run build` — compile TypeScript (`tsc`)
+- `npm run format` — format and lint with Biome (`biome check --write --unsafe .`)
 
 ### Code Quality
 
