@@ -13,8 +13,9 @@ The most significant challenge is that Closure Compiler relies on JSDoc for `ADV
 
 To maintain a type-safe, optimized project throughout the transition, we will adopt a **JSDoc-TS Strategy**:
 1.  We will configure TypeScript (`tsc` with `allowJs: true` and `checkJs: true`) to natively read and type-check the existing `.js` files based purely on their JSDoc.
-2.  We will migrate the module system (to ES Modules) while keeping the files as `.js` with JSDoc. This satisfies both `tsc` (for type checking) and Closure Compiler (for production bundling).
-3.  We will only rename files to `.ts` and convert JSDoc to inline TS syntax *after* the Closure Compiler dependency has been entirely removed from the production build.
+2.  We will migrate the module system incrementally to `goog.module` (Closure's modernized, locally-scoped module system). `goog.module` provides the exact same semantics as ES Modules (1:1 imports/exports) but allows bidirectional interop with legacy `goog.provide` files via `goog.module.declareLegacyNamespace()`.
+3.  Once the entire codebase is structured as `goog.module`, we will automate a syntactic translation to standard ES Modules (`import`/`export`) and remove Closure Compiler from the production build.
+4.  We will only rename files to `.ts` and convert JSDoc to inline TS syntax *after* the Closure Compiler dependency has been entirely removed from the production build.
 
 ## Phase 0: Tooling Alignment & Baselining
 **Goal:** Introduce modern TypeScript tooling without altering runtime code, establishing a dual-checked baseline.
@@ -24,19 +25,20 @@ To maintain a type-safe, optimized project throughout the transition, we will ad
 3.  **Modernize Externs Generation (`build/generateExterns.js`)**: Rewrite the script that generates Closure externs from source. Replace the fragile `@babel/parser` implementation with a robust script using the TypeScript Compiler API. This script will read the JSDoc/AST and emit accurate Closure externs. *Validation: The Demo app must continue to build and run successfully using these generated externs.*
 4.  **Replace `.d.ts` Generation**: Retire `build/generateTsDefs.py`. Configure `tsc` to emit high-quality `.d.ts` declaration files directly from the JSDoc.
 
-## Phase 1: Module System Migration
-**Goal:** Convert the internal dependency graph from Closure's `goog.*` to standard ES Modules.
+## Phase 1: Module System Migration (`goog.module`)
+**Goal:** Convert the internal dependency graph from `goog.provide` to `goog.module`.
 
-1.  **Leaf-First Conversion**: Incrementally update files, replacing `goog.provide` and `goog.require` with standard ES `export` and `import` statements. Files remain `.js` with JSDoc.
+1.  **Leaf-First Conversion**: Incrementally update files, replacing `goog.provide` with `goog.module('shaka...')` and `goog.module.declareLegacyNamespace()`. This scopes the file contents locally (like an ES Module) while allowing legacy `goog.provide` files to continue requiring them seamlessly. Files remain `.js` with JSDoc.
 2.  **Test Alignment**: Update corresponding unit tests in tandem with their source files.
-3.  **Continuous Validation**: Closure Compiler natively understands ES Modules. We will rely on the CI pipeline (integration tests, Demo app build) to ensure the generated bundles (`shaka-player.compiled.js`, etc.) remain structurally and behaviorally identical.
-4.  **Externs & Public API**: The existing `externs/shaka/*.js` files remain the source of truth for the API. The TS-based `generateExterns.js` script handles both legacy `goog.provide` and modern ES modules seamlessly.
+3.  **Continuous Validation**: We will rely on the CI pipeline (integration tests, Demo app build) to ensure the generated bundles remain structurally and behaviorally identical at every incremental step.
+4.  **Externs & Public API**: The existing `externs/shaka/*.js` files remain the source of truth for the API. The TS-based `generateExterns.js` script must handle both legacy `goog.provide` and new `goog.module` declarations.
 
-## Phase 2: Bundler Swap
-**Goal:** Replace Closure Compiler with a modern bundler (e.g., Rollup or ESBuild) for production builds.
+## Phase 2: ES Modules & Bundler Swap
+**Goal:** Transition to standard ES Modules and replace Closure Compiler with a modern bundler (e.g., Rollup or ESBuild) for production builds.
 
-1.  **Prerequisite**: All 300+ files must be fully converted to ES Modules. Closure's dependency management is no longer required.
-2.  **Implement Modern Bundler**: Introduce Rollup/ESBuild to bundle the ES Modules.
+1.  **Prerequisite**: All 300+ files must be fully converted to `goog.module`.
+2.  **Automated ES Module Conversion**: Because `goog.module` semantics directly map to standard ES modules, perform an automated codebase-wide translation from `goog.module` to standard ES `import` and `export` statements.
+3.  **Implement Modern Bundler**: Introduce Rollup/ESBuild to bundle the newly created ES Modules. Closure Compiler's dependency management is no longer required.
 3.  **Replicate Build Variants**: Configure the bundler to output the exact same artifact family (`+@complete`, `-@ui`, etc.) and preserve the `window.shaka` global IIFE wrapper.
 4.  **Validation**: Run the full suite of integration tests and Demo app checks against the *new* bundles to prove absolute API and runtime compatibility.
 

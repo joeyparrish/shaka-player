@@ -115,19 +115,19 @@ git commit -m "build: Add skeleton for TS-based externs generation"
 
 - [ ] **Step 1: Write the AST parsing logic**
 
-Replace `build/generateExternsTs.js` content with logic to parse files using `ts.createSourceFile` and extract `goog.provide`, `goog.require`, and JSDoc `@export` annotations.
+Replace `build/generateExternsTs.js` content with logic to parse files using `ts.createSourceFile` and extract `goog.provide`, `goog.module`, `goog.require`, and JSDoc `@export` annotations.
 
 ```javascript
 // build/generateExternsTs.js
 const ts = require('typescript');
 const fs = require('fs');
 
-function isGoogProvide(node) {
+function isGoogProvideOrModule(node) {
   return ts.isExpressionStatement(node) &&
          ts.isCallExpression(node.expression) &&
          ts.isPropertyAccessExpression(node.expression.expression) &&
          node.expression.expression.expression.text === 'goog' &&
-         node.expression.expression.name.text === 'provide';
+         (node.expression.expression.name.text === 'provide' || node.expression.expression.name.text === 'module');
 }
 
 function parseFile(filePath) {
@@ -138,7 +138,7 @@ function parseFile(filePath) {
   const requires = [];
   
   ts.forEachChild(sourceFile, node => {
-    if (isGoogProvide(node)) {
+    if (isGoogProvideOrModule(node)) {
         provides.push(node.expression.arguments[0].text);
     }
   });
