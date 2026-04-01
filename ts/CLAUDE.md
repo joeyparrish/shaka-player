@@ -5,6 +5,19 @@ code in this repository.
 
 ## Project Overview
 
+This is a TypeScript conversion of the Shaka Player library (`/lib`). The original
+uses Google Closure Compiler with `goog.provide`/`goog.require` modules. We are
+converting it to strict TypeScript with ES modules in `ts/lib/`.
+
+**Read before working:** `ts/migration/RULES.md`, `ts/migration/PLAN.md`
+
+Key principles:
+- **Translate, don't transform** — 1:1 behavioral mapping, no refactoring, no bug fixes
+- **Strict types** — `strict: true`, no `any`, no `@ts-ignore`, no `as` (unless browser API)
+- **Bottom-up order** — follow PLAN.md strictly, no skipping ahead
+- **`tsc --noEmit` after every step** — nothing merges unless it compiles
+- **Small commits** — one logical unit per commit
+
 ## Working Guidelines
 
 ### Workflow
