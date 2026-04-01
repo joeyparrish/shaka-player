@@ -8,6 +8,11 @@ This document outlines a high-level, serial transition plan to move the Shaka Pl
 *   **API Stability:** The public API (including the `window.shaka` global namespace) must remain identical for downstream consumers.
 *   **Testing as a Safety Net:** The existing integration tests and Closure-based Demo app will act as continuous validation of the build outputs and public API contracts throughout the transition.
 
+## Type Strictness Policy
+*   **Immediate Strict Mode:** TypeScript's `"strict": true` compiler flag will be enabled immediately in Phase 0. Every existing JS file must be fully and strictly typed (no implicit `any`, strict null checks) against `tsc` before the transition begins in earnest.
+*   **Banning 'any':** The use of the `any` type is strictly forbidden by default. Developers must strongly prefer the `unknown` type and employ proper type narrowing (e.g., type guard functions).
+*   **Documented Exceptions:** If an `any` type is absolutely necessary (e.g., due to a mismatch between Closure's type system and TypeScript's), it must be accompanied by an inline `// eslint-disable-next-line` directive and an explicit comment justifying the workaround. This policy will be enforced via ESLint rules (`@typescript-eslint/no-explicit-any`).
+
 ## Architectural Approach: JSDoc as the Bridge
 The most significant challenge is that Closure Compiler relies on JSDoc for `ADVANCED_OPTIMIZATIONS`, but standard TypeScript compilation (`.ts` -> `.js`) strips type information and does not emit JSDoc.
 

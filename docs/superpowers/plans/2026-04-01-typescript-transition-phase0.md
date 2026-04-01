@@ -26,7 +26,7 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": false,
+    "strict": true,
     "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
@@ -213,6 +213,41 @@ git commit -m "build: Configure tsc for .d.ts generation"
 ```
 
 ### Task 6: Iterative JSDoc Cleanup (Ongoing)
+
+This task represents the bulk of the manual work in Phase 0. It involves running `tsc -p tsconfig.check.json` and fixing the reported errors in `.js` files until the build is green.
+
+- [ ] **Step 1: Run Type Check**
+Run: `npx tsc -p tsconfig.check.json`
+
+- [ ] **Step 2: Fix Errors in a specific module/directory**
+- [ ] **Step 3: Verify Fixes**
+- [ ] **Step 4: Commit**
+
+*(Repeat until `tsc -p tsconfig.check.json` exits with 0)*
+
+---
+ault [
+  // ... existing config ...
+  {
+    plugins: {
+      '@typescript-eslint': typescriptEslintPlugin,
+    },
+    rules: {
+      // Forbid explicit 'any' types
+      '@typescript-eslint/no-explicit-any': 'error',
+    },
+  },
+];
+```
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add package.json package-lock.json eslint.config.mjs
+git commit -m "build: Enforce strict typescript policies via ESLint"
+```
+
+### Task 7: Iterative JSDoc Cleanup (Ongoing)
 
 This task represents the bulk of the manual work in Phase 0. It involves running `tsc -p tsconfig.check.json` and fixing the reported errors in `.js` files until the build is green.
 
