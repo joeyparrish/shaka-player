@@ -39,9 +39,10 @@ To maintain a type-safe, optimized project throughout the transition, we will ad
 1.  **Prerequisite**: All 300+ files must be fully converted to `goog.module`.
 2.  **Automated ES Module Conversion**: Because `goog.module` semantics directly map to standard ES modules, perform an automated codebase-wide translation from `goog.module` to standard ES `import` and `export` statements.
 3.  **Top-Level API Exports**: Because we lose `goog.module.declareLegacyNamespace()`, we must explicitly create a top-level entry point (e.g., `index.js`) that imports and re-exports the entire public API to maintain the global `window.shaka` namespace.
-4.  **Implement Modern Bundler**: Introduce Rollup/ESBuild to bundle the newly created ES Modules using the new top-level entry point. Closure Compiler's dependency management is no longer required.
+4.  **Implement Modern Bundler & Build Flags**: Introduce Rollup/ESBuild to bundle the newly created ES Modules using the new top-level entry point. The bundler must be configured with a replacement plugin (e.g., `@rollup/plugin-replace` or ESBuild's `define`) to handle the conditional build variants (e.g., stripping UI code for the base `compiled` variant), perfectly replicating Closure's dead-code elimination.
 5.  **Replicate Build Variants**: Configure the bundler to output the exact same artifact family (`+@complete`, `-@ui`, etc.) and preserve the `window.shaka` global IIFE wrapper.
-6.  **Validation**: Run the full suite of integration tests and Demo app checks against the *new* bundles to prove absolute API and runtime compatibility.
+6.  **Uncompiled Test Runner Updates**: The test runner (Karma) and `shaka-player.uncompiled.js` must be updated to natively load standard ES modules (`<script type="module">`) instead of relying on Closure's dependency loader.
+7.  **Validation**: Run the full suite of integration tests and Demo app checks against the *new* bundles to prove absolute API and runtime compatibility.
 
 ## Phase 3: Syntactic Sugar & Final Migration
 **Goal:** Convert the `.js` + JSDoc codebase to native `.ts` syntax.
@@ -49,11 +50,12 @@ To maintain a type-safe, optimized project throughout the transition, we will ad
 1.  **Prerequisite**: Closure Compiler is fully retired from the main library build. JSDoc is no longer strictly required for optimizations.
 2.  **Rename and Convert**: Mechanically rename `.js` files to `.ts`. Automate the translation of JSDoc type annotations into inline TypeScript syntax. Because `tsc` was already checking the types in Phase 0, this should introduce zero logical regressions.
 3.  **Convert Public API Source of Truth**: Translate `externs/shaka/*.js` into native TS interfaces (e.g., `src/api.ts`).
-4.  **Update Tooling**: Ensure the custom `generateExterns.js` script now reads the TS interfaces to continue emitting Closure externs for downstream consumers (like the Demo app).
+4.  **Environmental Externs Replacement**: The browser/platform externs in `externs/*.js` (outside `externs/shaka/`) will be retired. Standard APIs will be covered by TypeScript's built-in `lib.dom.d.ts`. Any experimental or non-standard web APIs will be defined in a custom `global.d.ts` file.
+5.  **Update Tooling**: Ensure the custom `generateExterns.js` script now reads the TS interfaces to continue emitting Closure externs for downstream consumers (like the Demo app).
 
 ## Phase 4: Ecosystem Modernization
 **Goal:** Clean up remaining technical debt and modernize dependent projects.
 
 1.  **Migrate the Demo App**: Move the Demo app away from its Closure library dependencies to standard TS/ES Modules, leveraging the newly typed main library.
-2.  **Documentation**: Update JSDoc generation tools to parse TypeScript AST instead of legacy comments.
+2.  **Documentation Generator Swap**: Replace the unmaintained, custom fork of JSDoc with a modern, TypeScript-native documentation generator (like **TypeDoc**). This directly parses the TS AST and modern TS interfaces, producing cleaner API docs with less custom tooling overhead.
 3.  **Final Cleanup**: Remove any lingering Closure-specific polyfills or workarounds from the build scripts.
