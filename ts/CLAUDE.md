@@ -27,6 +27,8 @@ Key principles:
 - Use superpowers (brainstorm → plan → execute) for any non-trivial task
 - Non-trivial = 3+ steps or architectural decisions
 - If something goes sideways, STOP and re-plan immediately
+- Commit between each task during plan execution
+- Commit the plan file itself after all tasks are complete
 
 ### Subagent Strategy
 
