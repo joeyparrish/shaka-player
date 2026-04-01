@@ -139,11 +139,11 @@ export function assert(
 /** Runtime instanceof check + TS type narrowing */
 export function assertInstanceof<T>(
   value: unknown,
-  constructor: new (...args: unknown[]) => T,
+  ctor: new (...args: unknown[]) => T,
   message?: string
 ): asserts value is T {
-  if (!(value instanceof constructor)) {
-    throw new Error(message ?? `Expected instance of ${constructor.name}`);
+  if (!(value instanceof ctor)) {
+    throw new Error(message ?? `Expected instance of ${ctor.name}`);
   }
 }
 
@@ -163,7 +163,7 @@ Mapping:
 |---------|-----------|
 | `goog.asserts.assert(x)` | `assert(x)` |
 | `goog.asserts.assert(x != null)` | `assertNonNull(x)` |
-| `goog.asserts.assertInstanceof(x, Foo)` | `assertInstanceof(x, Foo)` |
+| `goog.asserts.assertInstanceof(x, Foo)` | `assertInstanceof(x, Foo)` (uses `ctor` param) |
 | `goog.asserts.assertString(x)` | `assert(typeof x === 'string')` |
 | `goog.asserts.assertNumber(x)` | `assert(typeof x === 'number')` |
 
@@ -208,6 +208,29 @@ The original `shaka.util.Timer` becomes:
 | `@extends {Foo}` | `extends Foo` |
 | `@template T` | `<T>` generic |
 | `@final` | `// @final` comment (no TS enforcement) |
+
+---
+
+## Comments Format
+
+### Multi-line JSDoc Comments
+Use `/** ... */` for function and class descriptions. Max 80 characters per line:
+
+```typescript
+/**
+ * Runtime check + TS type narrowing.
+ * Replaces goog.asserts.assert.
+ */
+export function assert(condition: unknown): asserts condition { ... }
+```
+
+### Single-line Comments
+Use `//` for implementation details:
+
+```typescript
+// Implementation note
+if (condition) { ... }
+```
 
 ---
 
