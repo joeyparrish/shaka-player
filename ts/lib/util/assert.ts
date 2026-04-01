@@ -1,7 +1,3 @@
-/**
- * Runtime check + TS type narrowing.
- * Replaces goog.asserts.assert.
- */
 export function assert(
   condition: unknown,
   message?: string,
@@ -11,10 +7,6 @@ export function assert(
   }
 }
 
-/**
- * Runtime instanceof check + TS type narrowing.
- * Replaces goog.asserts.assertInstanceof.
- */
 export function assertInstanceof<T>(
   value: unknown,
   ctor: new (...args: unknown[]) => T,
@@ -25,10 +17,6 @@ export function assertInstanceof<T>(
   }
 }
 
-/**
- * Runtime non-null check + TS type narrowing.
- * Replaces goog.asserts.assertNonNull.
- */
 export function assertNonNull<T>(
   value: T | null | undefined,
   message?: string,
