@@ -11,6 +11,8 @@ converting it to strict TypeScript with ES modules in `ts/lib/`.
 
 **Read before working:** `ts/migration/RULES.md`, `ts/migration/PLAN.md`
 
+**Superpowers plans location:** `ts/migration/superpowers/`
+
 Key principles:
 - **Translate, don't transform** — 1:1 behavioral mapping, no refactoring, no bug fixes
 - **Strict types** — `strict: true`, no `any`, no `@ts-ignore`, no `as` (unless browser API)
