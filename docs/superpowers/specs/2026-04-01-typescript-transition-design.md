@@ -22,6 +22,12 @@ To maintain a type-safe, optimized project throughout the transition, we will ad
 3.  Once the entire codebase is structured as `goog.module`, we will automate a syntactic translation to standard ES Modules (`import`/`export`) and remove Closure Compiler from the production build.
 4.  We will only rename files to `.ts` and convert JSDoc to inline TS syntax *after* the Closure Compiler dependency has been entirely removed from the production build.
 
+## Developer Experience (DX) & CI Abstraction
+To ease contributors into the new ecosystem and isolate CI from the underlying script changes, we will aggressively adopt `npm run` scripts as an abstraction layer:
+1.  **Phase 0 NPM Cutover**: We will define comprehensive `npm run` scripts (e.g., `npm run build`, `npm run test`, `npm run lint`, `npm run check`) in `package.json`. These will initially wrap the legacy `python3 build/...` scripts alongside the new `tsc` and ESLint checks.
+2.  **CI & Documentation**: All `.github/workflows/*.yaml` files and `AGENTS.md` instructions will be immediately updated to use these `npm run` commands in Phase 0.
+3.  **Incremental Tutorials**: Tutorials (e.g., `docs/tutorials/plugins.md`) will be updated incrementally. In Phase 0, we will update references to point to `npm run` where appropriate. In Phase 2 (Bundler Swap), we will rewrite the specific tutorials that document legacy python build flags (`+@complete -@polyfill`) to reflect the new static entry point architecture.
+
 ## Phase 0: Tooling Alignment & Baselining
 **Goal:** Introduce modern TypeScript tooling without altering runtime code, establishing a dual-checked baseline.
 

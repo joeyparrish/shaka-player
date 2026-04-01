@@ -212,21 +212,22 @@ git add tsconfig.dts.json
 git commit -m "build: Configure tsc for .d.ts generation"
 ```
 
-### Task 6: Iterative JSDoc Cleanup (Ongoing)
+### Task 6: Configure ESLint Strictness Policy
 
-This task represents the bulk of the manual work in Phase 0. It involves running `tsc -p tsconfig.check.json` and fixing the reported errors in `.js` files until the build is green.
+**Files:**
+- Modify: `eslint.config.mjs`
 
-- [ ] **Step 1: Run Type Check**
-Run: `npx tsc -p tsconfig.check.json`
+- [ ] **Step 1: Install TypeScript ESLint plugin**
 
-- [ ] **Step 2: Fix Errors in a specific module/directory**
-- [ ] **Step 3: Verify Fixes**
-- [ ] **Step 4: Commit**
+Run: `npm install --save-dev @typescript-eslint/eslint-plugin @typescript-eslint/parser`
 
-*(Repeat until `tsc -p tsconfig.check.json` exits with 0)*
+- [ ] **Step 2: Add strict 'any' rule**
 
----
-ault [
+Update the ESLint configuration to ban `any` and require explicit justification for bypasses. We want developers to use `unknown` and narrow types instead.
+
+```javascript
+// Inside eslint.config.mjs
+export default [
   // ... existing config ...
   {
     plugins: {
@@ -259,5 +260,46 @@ Run: `npx tsc -p tsconfig.check.json`
 - [ ] **Step 4: Commit**
 
 *(Repeat until `tsc -p tsconfig.check.json` exits with 0)*
+
+### Task 8: Establish NPM Abstraction Layer & Update CI/Docs
+
+**Files:**
+- Modify: `package.json`
+- Modify: `.github/workflows/*.yaml`
+- Modify: `AGENTS.md`
+- Modify: `docs/tutorials/*.md`
+
+- [ ] **Step 1: Define comprehensive NPM scripts in `package.json`**
+
+Add or update the `"scripts"` block in `package.json` to act as the primary abstraction for all build/test commands. These should wrap the legacy python scripts and the new TS tools. For example:
+```json
+  "scripts": {
+    "build": "python3 build/all.py",
+    "test": "python3 build/test.py",
+    "lint": "python3 build/check.py && eslint .",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "check": "npm run lint && npm run typecheck",
+    "docs": "python3 build/docs.py"
+  }
+```
+
+- [ ] **Step 2: Update CI Workflows**
+
+Search through all `.github/workflows/*.yaml` files. Replace direct invocations of `python3 build/all.py` with `npm run build`, `python3 build/test.py` with `npm run test`, etc. Add a step to run `npm run check` to ensure the strict `tsc` checks are enforced in CI.
+
+- [ ] **Step 3: Update `AGENTS.md`**
+
+Update the "Current Build System" section of `AGENTS.md` to indicate that `npm run <script>` is the preferred interface for standard tasks, while noting that `python3 build/build.py` is still used underneath for custom variants.
+
+- [ ] **Step 4: Incremental Tutorial Updates**
+
+Search `docs/tutorials/*.md` for legacy build commands (`python3 build/...`) and replace them with their equivalent `npm run ...` commands where appropriate. (Note: Tutorials demonstrating specific `build.py` flags like `+@complete` should retain the python command until Phase 2).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add package.json .github/workflows/ AGENTS.md docs/tutorials/
+git commit -m "build: Abstract build tools via npm scripts and update CI/Docs"
+```
 
 ---
