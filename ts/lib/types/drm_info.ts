@@ -10,23 +10,39 @@
  * are specified {@link https://bit.ly/EmeInitTypes here}.
  */
 export interface InitDataOverride {
-  /** Initialization data in the format indicated by initDataType. */
+  /**
+   * Initialization data in the format indicated by initDataType.
+   */
   initData: Uint8Array;
-  /** A string to indicate what format initData is in. */
+  /**
+   * A string to indicate what format initData is in.
+   */
   initDataType: string;
-  /** The key Id that corresponds to this initData. */
+  /**
+   * The key Id that corresponds to this initData.
+   */
   keyId: string | null;
 }
 
-/** DRM configuration for a single key system. */
+/**
+ * DRM configuration for a single key system.
+ */
 export interface DrmInfo {
-  /** The key system, e.g., "com.widevine.alpha". */
+  /**
+   * The key system, e.g., "com.widevine.alpha".
+   */
   keySystem: string;
-  /** The encryption scheme, e.g., "cenc", "cbcs", "cbcs-1-9". */
+  /**
+   * The encryption scheme, e.g., "cenc", "cbcs", "cbcs-1-9".
+   */
   encryptionScheme: string;
-  /** The key system uri, e.g., "skd://" for fairplay. */
+  /**
+   * The key system uri, e.g., "skd://" for fairplay.
+   */
   keySystemUris?: Set<string>;
-  /** The license server URI. */
+  /**
+   * The license server URI.
+   */
   licenseServerUri: string;
   /**
    * True if the application requires the key system to support distinctive
@@ -38,9 +54,13 @@ export interface DrmInfo {
    * state, e.g., for persistent license storage.
    */
   persistentStateRequired: boolean;
-  /** A key-system-specific string that specifies a required security level. */
+  /**
+   * A key-system-specific string that specifies a required security level.
+   */
   audioRobustness: string;
-  /** A key-system-specific string that specifies a required security level. */
+  /**
+   * A key-system-specific string that specifies a required security level.
+   */
   videoRobustness: string;
   /**
    * A key-system-specific server certificate used to encrypt license requests.
@@ -55,7 +75,9 @@ export interface DrmInfo {
    * certificate will be requested from this URI.
    */
   serverCertificateUri: string;
-  /** The session type, e.g., "temporary". */
+  /**
+   * The session type, e.g., "temporary".
+   */
   sessionType: string;
   /**
    * A list of initialization data which override any initialization data found

@@ -5,8 +5,12 @@
  */
 
 export interface Resolution {
-  /** Width in pixels. */
+  /**
+   * Width in pixels.
+   */
   width: number;
-  /** Height in pixels. */
+  /**
+   * Height in pixels.
+   */
   height: number;
 }

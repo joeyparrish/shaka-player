@@ -221,12 +221,15 @@ Migrate all descriptive comments from the source. If the original has a comment,
 **Do remove** comments that only restate the declaration name with no additional information (`/** Timer. */ export class Timer`, `/** MPEG_PES. */ export interface MPEG_PES`).
 
 ### Multi-line JSDoc Comments
-Use `/** ... */` for function, class, and property descriptions migrated from the source. Max 80 characters per line:
+Use `/** ... */` for function, class, and property descriptions migrated from the source. Max 80 characters per line. **JSDoc comments must never be on a single line** — always use multi-line format, even for short descriptions:
 
 ```typescript
+// Bad:
+/** The name of the thing. */
+
+// Good:
 /**
- * Runtime check + TS type narrowing.
- * Replaces goog.asserts.assert.
+ * The name of the thing.
  */
 export function assert(condition: unknown): asserts condition { ... }
 ```

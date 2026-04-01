@@ -16,7 +16,9 @@ export interface RestrictionInfo {
    * restrictions.
    */
   hasAppRestrictions: boolean;
-  /** The key IDs that were missing. */
+  /**
+   * The key IDs that were missing.
+   */
   missingKeys: string[];
   /**
    * The restricted EME key statuses that the streams had.  For example,

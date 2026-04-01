@@ -11,7 +11,9 @@ type Mp4Parser = unknown;
 type DataViewReader = unknown;
 
 export interface ParsedBox {
-  /** The box name, a 4-character string (fourcc). */
+  /**
+   * The box name, a 4-character string (fourcc).
+   */
   name: string;
   /**
    * The parser that parsed this box. The parser can be used to parse child
@@ -26,24 +28,35 @@ export interface ParsedBox {
    * propagated through methods like children().
    */
   partialOkay: boolean;
-  /** If true, stop reading if an incomplete box is detected. */
+  /**
+   * If true, stop reading if an incomplete box is detected.
+   */
   stopOnPartial: boolean;
   /**
    * The start of this box (before the header) in the original buffer. This
    * start position is the absolute position.
    */
   start: number;
-  /** The size of this box (including the header). */
+  /**
+   * The size of this box (including the header).
+   */
   size: number;
-  /** The version for a full box, null for basic boxes. */
+  /**
+   * The version for a full box, null for basic boxes.
+   */
   version: number | null;
-  /** The flags for a full box, null for basic boxes. */
+  /**
+   * The flags for a full box, null for basic boxes.
+   */
   flags: number | null;
   /**
    * The reader for this box is only for this box. Reading or not reading to
    * the end will have no affect on the parser reading other sibling boxes.
    */
   reader: DataViewReader;
-  /** If true, the box header had a 64-bit size field. This affects the offsets of other fields. */
+  /**
+   * If true, the box header had a 64-bit size field. This affects the offsets
+   * of other fields.
+   */
   has64BitSize: boolean;
 }
