@@ -15,7 +15,7 @@ Step-by-step checklist for converting Shaka Player from JavaScript to TypeScript
 
 - [x] **1.1 Project setup** — `package.json`, `tsconfig.json`, `biome.json`, `ts/lib/types/utility.ts` (ValueOf type), `ts/lib/util/assert.ts` (assertion utilities)
 - [x] **1.2 Types: standalone** — convert `resolution.ts`, `codecs.ts`, `mp4_parser.ts` (no cross-deps)
-- [ ] **1.3 Types: error + drm** — convert `error.ts`, `drm_info.ts`, `abortable.ts`
+- [x] **1.3 Types: error + drm** — convert `error.ts`, `drm_info.ts`, `abortable.ts`
 - [ ] **1.4 Types: net** — convert `net.ts` (references DrmInfo)
 - [ ] **1.5 Types: manifest** — convert `manifest.ts` (references DrmInfo, media types — use forward declarations)
 - [ ] **1.6 Types: text + cea + transmuxer** — convert `text.ts`, `cea.ts`, `transmuxer.ts`
