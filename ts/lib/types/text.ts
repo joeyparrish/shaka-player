@@ -10,7 +10,8 @@ export type Cue = unknown;
 // Resolves at Step 10.1 (player)
 export type Player = unknown;
 // Resolves at Step 2.1 (core utilities)
-export interface IDestroyable {}
+// biome-ignore lint/complexity/noBannedTypes: Forward declaration requires an object type
+export type IDestroyable = {};
 // Resolves at Step 1.9 (player types)
 export type TextDisplayerConfiguration = unknown;
 

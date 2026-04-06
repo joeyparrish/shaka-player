@@ -19,7 +19,7 @@ Step-by-step checklist for converting Shaka Player from JavaScript to TypeScript
 - [x] **1.4 Types: net** — convert `net.ts` (references DrmInfo)
 - [x] **1.5 Types: manifest** — convert `manifest.ts` (references DrmInfo, media types — use forward declarations)
 - [x] **1.6 Types: text + cea + transmuxer** — convert `text.ts`, `cea.ts`, `transmuxer.ts`
-- [ ] **1.7 Types: manager interfaces** — convert `abr_manager.ts`, `manifest_parser.ts`, `adaptation_set_criteria.ts`
+- [x] **1.7 Types: manager interfaces** — convert `abr_manager.ts`, `manifest_parser.ts`, `adaptation_set_criteria.ts`
 - [ ] **1.8 Types: feature types** — convert `ads.ts`, `queue.ts`, `offline.ts`, `offline_compat_v1.ts`, `offline_compat_v2.ts`
 - [ ] **1.9 Types: player** — convert `player.ts` (largest type file — all config, track, stats types)
 - [ ] **1.10 Types: barrel file** — create `ts/lib/types/index.ts` re-exporting everything
