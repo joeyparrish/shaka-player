@@ -1,5 +1,74 @@
 # Changelog
 
+## [5.2.0](https://github.com/joeyparrish/shaka-player/compare/v5.1.0...v5.2.0) (2026-05-19)
+
+
+### Features
+
+* Add requestVideoFrameCallback polyfill ([#10083](https://github.com/joeyparrish/shaka-player/issues/10083)) ([157f319](https://github.com/joeyparrish/shaka-player/commit/157f319a914a79b98a3a8ce13bd114b0c9fcdfd9))
+* Add timeToFirstFrame to stats ([#10065](https://github.com/joeyparrish/shaka-player/issues/10065)) ([19b2c10](https://github.com/joeyparrish/shaka-player/commit/19b2c10bd4e226534034c7c0bfed7dee73112877))
+* **Demo:** Use monospace in extra config text areas ([#10024](https://github.com/joeyparrish/shaka-player/issues/10024)) ([3a59de0](https://github.com/joeyparrish/shaka-player/commit/3a59de01ba6b7f7261cf28a1e383d77226211302))
+* **MSF:** Add accessibility parsing in the catalog (CEA-608/708) ([#10040](https://github.com/joeyparrish/shaka-player/issues/10040)) ([e9551b3](https://github.com/joeyparrish/shaka-player/commit/e9551b3ee21f77d1c247837040f3138aeb5b8752))
+* **MSF:** Add catalogPreprocessor config ([#9990](https://github.com/joeyparrish/shaka-player/issues/9990)) ([ef83be2](https://github.com/joeyparrish/shaka-player/commit/ef83be209f74ed7c6409604087ddec7d8a73f3f4))
+* **MSF:** Add LoC support ([#10035](https://github.com/joeyparrish/shaka-player/issues/10035)) ([f9d7f1f](https://github.com/joeyparrish/shaka-player/commit/f9d7f1fc2ca43ab3d6df143c51f09515895c8dca))
+* **MSF:** Provide a bandwidth estimate for ABR purposes ([#10016](https://github.com/joeyparrish/shaka-player/issues/10016)) ([1a845ec](https://github.com/joeyparrish/shaka-player/commit/1a845ec353e68760e5b291d7460bce9db1633564))
+* **UI:** add always-visible skip buttons for big button layout with disabled state ([#10062](https://github.com/joeyparrish/shaka-player/issues/10062)) ([fd4b1cd](https://github.com/joeyparrish/shaka-player/commit/fd4b1cd45181e52ab4f9da277da4286c6392d277))
+* **UI:** Add live subtitle style preview on hover ([#10077](https://github.com/joeyparrish/shaka-player/issues/10077)) ([415ebdc](https://github.com/joeyparrish/shaka-player/commit/415ebdc52e1d67729aba0fa89c1421885dbdcf66))
+* **UI:** Add new play_pause_buffering button ([#10039](https://github.com/joeyparrish/shaka-player/issues/10039)) ([64dc709](https://github.com/joeyparrish/shaka-player/commit/64dc7097c9251c78bf6fab8d7cbbcb9ac3a15d28))
+* **UI:** Allow custom format and imageQuality in takeScreenshot and copyVideoFrameToClipboard ([#10012](https://github.com/joeyparrish/shaka-player/issues/10012)) ([b0e3015](https://github.com/joeyparrish/shaka-player/commit/b0e3015962b0d11d5a0021ed9747bb4aadb7288c))
+* **UI:** Improve shaka player UI accessibility ([#10023](https://github.com/joeyparrish/shaka-player/issues/10023)) ([f1c0468](https://github.com/joeyparrish/shaka-player/commit/f1c0468f70333678bfb7ee73f74846b365bbf796))
+* **UI:** Map ID3 TPE1 and TALB tags to MediaSession metadata ([#10109](https://github.com/joeyparrish/shaka-player/issues/10109)) ([3cc1e77](https://github.com/joeyparrish/shaka-player/commit/3cc1e77259119111053c071a35943d207f89a22a))
+* **UI:** Support customizing resolution menu labels via customTrackLabel ([#10096](https://github.com/joeyparrish/shaka-player/issues/10096)) ([bb18838](https://github.com/joeyparrish/shaka-player/commit/bb18838b280f6c06a0d380253de755a5e0aaf715))
+* **UI:** Support embedded APIC artwork blobs in MediaSession ([#10107](https://github.com/joeyparrish/shaka-player/issues/10107)) ([066ca5f](https://github.com/joeyparrish/shaka-player/commit/066ca5ffe8772e33f412ae0e21b7e750115789c6))
+* **UI:** Support repeat modes in loop button when using QueueManager ([#10027](https://github.com/joeyparrish/shaka-player/issues/10027)) ([24ab2be](https://github.com/joeyparrish/shaka-player/commit/24ab2be1aa2fb44028a29eb389a3350bf49c0e3c))
+* **UITextDisplayer:** add suspendRenderingWhenHidden config ([#10043](https://github.com/joeyparrish/shaka-player/issues/10043)) ([27ed71e](https://github.com/joeyparrish/shaka-player/commit/27ed71e7912a8c1a7c741b1fd803229e0de78b31))
+* **UI:** Use UI language to display languages names ([#10036](https://github.com/joeyparrish/shaka-player/issues/10036)) ([18af32c](https://github.com/joeyparrish/shaka-player/commit/18af32c1a2513799333c65e9f47c8091b7a457c4))
+
+
+### Bug Fixes
+
+* **ABR:** Fix playbackRate calculation when using droppedFrames ([#10011](https://github.com/joeyparrish/shaka-player/issues/10011)) ([62ea2f6](https://github.com/joeyparrish/shaka-player/commit/62ea2f6c5c8f40a75d469a862253c20c55e9f12f))
+* Allow use preferredText with external tracks ([#10019](https://github.com/joeyparrish/shaka-player/issues/10019)) ([3d11d75](https://github.com/joeyparrish/shaka-player/commit/3d11d75e10dfd16617332cbe539828d9aecfbe74))
+* avoid pts rollover correction for fmp4/cmaf streams ([#10021](https://github.com/joeyparrish/shaka-player/issues/10021)) ([c2ad355](https://github.com/joeyparrish/shaka-player/commit/c2ad355e28048b15c44e3d768fa9ceb43e69c728)), closes [#10020](https://github.com/joeyparrish/shaka-player/issues/10020)
+* Avoid race condition in concurrent getAllThumbnails calls ([#10022](https://github.com/joeyparrish/shaka-player/issues/10022)) ([12179a2](https://github.com/joeyparrish/shaka-player/commit/12179a21c4d7fa61b96e74992655cabc938aefce))
+* Avoid uncaught TypeError when destroying player during DRM key status change ([#9992](https://github.com/joeyparrish/shaka-player/issues/9992)) ([281b7c4](https://github.com/joeyparrish/shaka-player/commit/281b7c4a024c5cc80697e6340b107aa571da32d4))
+* Bail out on initial text preference when a user selected one manually. ([#10010](https://github.com/joeyparrish/shaka-player/issues/10010)) ([09b6c94](https://github.com/joeyparrish/shaka-player/commit/09b6c94ad89f2e0a2bf7ce17de75328fd2802ffd))
+* Clamp playback rate to 16x and improve playhead movement behavior ([#9996](https://github.com/joeyparrish/shaka-player/issues/9996)) ([9d8b383](https://github.com/joeyparrish/shaka-player/commit/9d8b3837eb638f4612fad11f663f3f882f25fbde))
+* **demo:** Fix audio-only animated poster ([#9986](https://github.com/joeyparrish/shaka-player/issues/9986)) ([d64ff80](https://github.com/joeyparrish/shaka-player/commit/d64ff80eba1f6bbf14d1f96d0dccaf5d0b0dc1a5))
+* **Demo:** Fix audio-only animated poster on custom content ([#9995](https://github.com/joeyparrish/shaka-player/issues/9995)) ([b0de223](https://github.com/joeyparrish/shaka-player/commit/b0de2238334b0831c004fe13a1b864aa314a0bcd))
+* fix opus transmux sample duration ([#10090](https://github.com/joeyparrish/shaka-player/issues/10090)) ([e19506b](https://github.com/joeyparrish/shaka-player/commit/e19506bf8b6e8a6d0362413445fd08254679283c))
+* Fix XML node attribute externs ([#10111](https://github.com/joeyparrish/shaka-player/issues/10111)) ([1977e2f](https://github.com/joeyparrish/shaka-player/commit/1977e2fe398b57c4a19d73c1a5a86b5c8d58611e))
+* force gap jump when stalled at the end of a buffer ([#10086](https://github.com/joeyparrish/shaka-player/issues/10086)) ([e328ca2](https://github.com/joeyparrish/shaka-player/commit/e328ca2e50aeee839744a4badb4ab66e463531f1))
+* handle AC-4 immersive stereo (IMSA) in HLS and DASH spatial audio detection ([#10007](https://github.com/joeyparrish/shaka-player/issues/10007)) ([b113cad](https://github.com/joeyparrish/shaka-player/commit/b113cadd36cd072719437aea89b529312f325d45))
+* **HLS:** Fix SAMPLE-AES identity stall at waitingforkey event on track switch ([#10000](https://github.com/joeyparrish/shaka-player/issues/10000)) ([bce50f0](https://github.com/joeyparrish/shaka-player/commit/bce50f0c7ab39da884682749e2fdbdc846cf3be0))
+* **HLS:** Fix timeline sync gaps on discontinuity sequences ([#10087](https://github.com/joeyparrish/shaka-player/issues/10087)) ([589131f](https://github.com/joeyparrish/shaka-player/commit/589131fd0d34383234bc55d0b99e3a7fd2840a66))
+* **MSF:** Fix namespace handling ([#9988](https://github.com/joeyparrish/shaka-player/issues/9988)) ([ef2bd7f](https://github.com/joeyparrish/shaka-player/commit/ef2bd7f547933a63d4dc1d8eedad6acb8a75c13f))
+* **MSF:** handle WebTransport.closed rejection to avoid Safari unhandled promise error ([#10056](https://github.com/joeyparrish/shaka-player/issues/10056)) ([b84c35d](https://github.com/joeyparrish/shaka-player/commit/b84c35df62c8927c8a1dda4592af4f1641aa71cf))
+* **Offline:** Only request the license on download when usePersistentLicense is true ([#10074](https://github.com/joeyparrish/shaka-player/issues/10074)) ([ad8e734](https://github.com/joeyparrish/shaka-player/commit/ad8e734ad475d9fc35f05652d19ac33086086cde))
+* **text:** include regionAnchorX/Y in region cache key ([#10073](https://github.com/joeyparrish/shaka-player/issues/10073)) ([99fb7e4](https://github.com/joeyparrish/shaka-player/commit/99fb7e4f8e15817844dd482d17a9e9266f405a84))
+* **UI:** check if ad is linear before updating mute label and icon ([#10044](https://github.com/joeyparrish/shaka-player/issues/10044)) ([038b3ce](https://github.com/joeyparrish/shaka-player/commit/038b3ce1d7bfc5ab141f3bfbe9e179c5ab2d33e9))
+* **UI:** Fix parent param type in shaka.ui.Icon constructor ([#10014](https://github.com/joeyparrish/shaka-player/issues/10014)) ([82e9147](https://github.com/joeyparrish/shaka-player/commit/82e914740c760474e1a25f3bec31217836be9ed8))
+* **UI:** Fix wrong wheel directions on volume bar ([#10001](https://github.com/joeyparrish/shaka-player/issues/10001)) ([e0808e7](https://github.com/joeyparrish/shaka-player/commit/e0808e7dadfba48a2bca062756533c4bf8a0378e))
+* **UI:** Remove buffered bar delay after seeking ([#10071](https://github.com/joeyparrish/shaka-player/issues/10071)) ([26970ae](https://github.com/joeyparrish/shaka-player/commit/26970aee4ff39823ea25e557a54a7b17e4ebddd7))
+
+
+### Performance Improvements
+
+* **DASH:** lazy segment reference creation ([#10050](https://github.com/joeyparrish/shaka-player/issues/10050)) ([8d4ac31](https://github.com/joeyparrish/shaka-player/commit/8d4ac31999ba0e70b3d6424ba8bcc098f7239b3a))
+* **HLS:** skip merging known segments on live playlist updates ([#9998](https://github.com/joeyparrish/shaka-player/issues/9998)) ([b460575](https://github.com/joeyparrish/shaka-player/commit/b4605750c8b67438f647ba08331b7e2995ff9cbd))
+* **HLS:** skip rebuilding known refs on live playlist refresh ([#10075](https://github.com/joeyparrish/shaka-player/issues/10075)) ([af30680](https://github.com/joeyparrish/shaka-player/commit/af306801b89034ba28918c742be333942c66e502))
+* **media:** replace slice with in-place array truncation ([#10070](https://github.com/joeyparrish/shaka-player/issues/10070)) ([ad2df90](https://github.com/joeyparrish/shaka-player/commit/ad2df90da1a04509e6661ef1a0e789c0cac5a697))
+* **Mp4Generator:** assemble segment data in a single allocation ([#10101](https://github.com/joeyparrish/shaka-player/issues/10101)) ([5492f31](https://github.com/joeyparrish/shaka-player/commit/5492f31b1afab378982a9d65996c622a6cc086e8))
+* **player:** avoid full configuration deep-clone in time update callback ([#10098](https://github.com/joeyparrish/shaka-player/issues/10098)) ([96e6f63](https://github.com/joeyparrish/shaka-player/commit/96e6f63431c1641e5e44ffa8905c74f5ed5d361e))
+* Remove unnecessary allocations in Mp4Generator ([#10059](https://github.com/joeyparrish/shaka-player/issues/10059)) ([71ccb11](https://github.com/joeyparrish/shaka-player/commit/71ccb11cd643253fb92182de4c89905675b90561))
+* Remove unnecessary Uint8Array allocations in Mp4Generator ([#10069](https://github.com/joeyparrish/shaka-player/issues/10069)) ([b5ad8cc](https://github.com/joeyparrish/shaka-player/commit/b5ad8ccc8c53963ede59b612c160a633bb124aab))
+* Remove unnecessary Uint8ArrayUtils.concat calls in Mp4Generator ([#10047](https://github.com/joeyparrish/shaka-player/issues/10047)) ([f730953](https://github.com/joeyparrish/shaka-player/commit/f7309534fb22a9a4b9d136d0d8aa711844d23b59))
+* **segments:** use binary search for segment lookup in more hot paths ([#9997](https://github.com/joeyparrish/shaka-player/issues/9997)) ([44dfab1](https://github.com/joeyparrish/shaka-player/commit/44dfab167a3aef14c1d42184aa1682a1ed3f29c6))
+* **transmuxer:** Avoid repeatedly creating empty Uint8Arrays ([#10100](https://github.com/joeyparrish/shaka-player/issues/10100)) ([de30b70](https://github.com/joeyparrish/shaka-player/commit/de30b7003a8be908b5a9b9de4dff9abe579112bc))
+* **transmuxer:** Merge consecutive Uint8Arrays in h265 transmuxer ([#10046](https://github.com/joeyparrish/shaka-player/issues/10046)) ([84e24c7](https://github.com/joeyparrish/shaka-player/commit/84e24c7df563b2672055435e4838694afcb63f14))
+* **transmuxer:** Reduce per-frame object allocations for h265, ac-3 and ec-3 ([#10094](https://github.com/joeyparrish/shaka-player/issues/10094)) ([5c836b1](https://github.com/joeyparrish/shaka-player/commit/5c836b1f72f0c6386fd60ecce2c78d200c34550b))
+* **UI:** Skip touch listeners when maxTouchPoints is 0 ([#9981](https://github.com/joeyparrish/shaka-player/issues/9981)) ([d07037b](https://github.com/joeyparrish/shaka-player/commit/d07037bb661481450d9a5a7028c7cbfc43f9a9ba))
+
 ## [5.1.0](https://github.com/shaka-project/shaka-player/compare/v5.0.0...v5.1.0) (2026-04-15)
 
 
