@@ -102,6 +102,18 @@ debug_closure_defines = [
 release_closure_opts = [
     '-O', 'ADVANCED',
 ]
+
+# EXPERIMENTAL: let Closure bundle and type-check, but do no property renaming
+# and no whole-program dead code elimination, so that a standalone minifier can
+# be evaluated in its place.  Enabled by --no-minify.
+no_minify_closure_opts = [
+    '-O', 'SIMPLE',
+    '--formatting', 'PRETTY_PRINT',
+]
+
+# Set from main() by the --no-minify flag.
+no_minify = False
+
 release_closure_defines = [
     '-D', 'goog.DEBUG=false',
     '-D', 'goog.asserts.ENABLE_ASSERTS=false',
@@ -295,6 +307,8 @@ class Build(object):
     closure_opts += ['--language_out', langout]
     if is_debug:
       closure_opts += debug_closure_opts + debug_closure_defines
+    elif no_minify:
+      closure_opts += no_minify_closure_opts + release_closure_defines
     else:
       closure_opts += release_closure_opts + release_closure_defines
 
@@ -368,6 +382,8 @@ class Build(object):
     closure_opts += ['--language_out', langout]
     if is_debug:
       closure_opts += debug_closure_opts + debug_closure_defines
+    elif no_minify:
+      closure_opts += no_minify_closure_opts + release_closure_defines
     else:
       closure_opts += release_closure_opts + release_closure_defines
 
@@ -450,6 +466,12 @@ def main(args):
       default='ECMASCRIPT5')
 
   parser.add_argument(
+    '--no-minify',
+    help='EXPERIMENTAL: bundle and type-check with Closure, but do no '
+         'renaming, so an external minifier can be evaluated in its place.',
+    action='store_true')
+
+  parser.add_argument(
     '--skip-ts',
     help='Skips generation of TypeScript definition files (.d.ts).',
     action='store_true')
@@ -465,6 +487,9 @@ def main(args):
     action='store_true')
 
   parsed_args, commands = parser.parse_known_args(args)
+
+  global no_minify
+  no_minify = parsed_args.no_minify
 
   # Make the dist/ folder, ignore errors.
   base = shakaBuildHelpers.get_source_base()
