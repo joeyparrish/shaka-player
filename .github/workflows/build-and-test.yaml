@@ -57,44 +57,49 @@ jobs:
           # Additionally, generate a code coverage report from Linux Chrome.
           # It should be the uncompiled build, or else we won't execute any
           # coverage instrumentation on full-stack player integration tests.
-          - os: ubuntu-latest
-            browser: Chrome
-            extra_flags: "--use-xvfb --running_in_vm"
-          - os: ubuntu-latest
-            browser: Firefox
-            extra_flags: "--use-xvfb --running_in_vm"
-          - os: ubuntu-latest
-            browser: Opera
-            extra_flags: "--use-xvfb --running_in_vm"
-
-          - os: macos-latest
-            browser: Chrome
-            extra_flags: "--running_in_vm"
-          - os: macos-latest
-            browser: Edge
-            extra_flags: "--running_in_vm"
-          - os: macos-latest
-            browser: Opera
-            extra_flags: "--running_in_vm"
-          - os: macos-latest
-            browser: Firefox
-            extra_flags: "--running_in_vm"
-          - os: macos-latest
-            browser: Safari
-            extra_flags: "--running_in_vm"
-
-          - os: windows-latest
-            browser: Chrome
-            extra_flags: "--running_in_vm"
-          - os: windows-latest
-            browser: Firefox
-            extra_flags: "--running_in_vm"
-          - os: windows-latest
-            browser: Edge
-            extra_flags: "--html-coverage-report --uncompiled --running_in_vm"
+#          - os: ubuntu-latest
+#            browser: Chrome
+#            extra_flags: "--use-xvfb --running_in_vm"
+#          - os: ubuntu-latest
+#            browser: Firefox
+#            extra_flags: "--use-xvfb --running_in_vm"
+#          - os: ubuntu-latest
+#            browser: Opera
+#            extra_flags: "--use-xvfb --running_in_vm"
+#
+#          - os: macos-latest
+#            browser: Chrome
+#            extra_flags: "--running_in_vm"
+#          - os: macos-latest
+#            browser: Edge
+#            extra_flags: "--running_in_vm"
+#          - os: macos-latest
+#            browser: Opera
+#            extra_flags: "--running_in_vm"
+#          - os: macos-latest
+#            browser: Firefox
+#            extra_flags: "--running_in_vm"
+#          - os: macos-latest
+#            browser: Safari
+#            extra_flags: "--running_in_vm"
+#
+#          - os: windows-latest
+#            browser: Chrome
+#            extra_flags: "--running_in_vm"
+#          - os: windows-latest
+#            browser: Firefox
+#            extra_flags: "--running_in_vm"
+#          - os: windows-latest
+#            browser: Edge
+#            extra_flags: "--html-coverage-report --uncompiled --running_in_vm"
           # Disabled until working properly
           # - os: windows-latest
           #   browser: Opera
+
+          # Special branches below will launch an Android emulator and adb.
+          - os: ubuntu-latest
+            browser: ChromeAndroid
+            extra_flags: "--running_in_vm"
 
       # Disable fail-fast so that one matrix-job failing doesn't make the other
       # ones end early.
@@ -166,7 +171,68 @@ jobs:
           name: player-build
           path: dist/
 
+      # FIXME
+      - name: Temporary workaround for Karma Launcher
+        if: matrix.browser == 'ChromeAndroid'
+        run: |
+          npm ci
+          patch -p1 -i ../../karma-launcher.diff -d node_modules/karma-local-wd-launcher/
+          touch node_modules/.last_update
+
+      # FIXME
+      - name: Temporary Chrome apks
+        if: matrix.browser == 'ChromeAndroid'
+        run: |
+          mkdir apks
+          wget -O chrome-apks.zip https://storage.googleapis.com/shaka-demo-assets/_joey/com.android.chrome_151.0.7922.71.apkm
+          cd apks
+          unzip ../chrome-apks.zip
+
+      - name: Enable KVM for Android emulator
+        if: matrix.browser == 'ChromeAndroid'
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Cache the Android Virtual Device
+        if: matrix.browser == 'ChromeAndroid'
+        uses: actions/cache@v6
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-arm64-v8a
+
+      - name: Create Android Virtual Device
+        if: matrix.browser == 'ChromeAndroid' && steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          arch: arm64-v8a
+          profile: pixel_7_pro
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: echo "Generated AVD snapshot for caching."
+
+      - name: Test Player in Android Emulator
+        if: matrix.browser == 'ChromeAndroid'
+        timeout-minutes: 25
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          arch: arm64-v8a
+          profile: pixel_7_pro
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          # Create a reverse tunnel for Karma, then launch the tests via webdriver
+          script: adb reverse tcp:9876 tcp:9876 && adb install-multiple apks/*.apk && python3 build/test.py --no-build --browsers ChromeAndroid --reporters spec --spec-hide-passed ${{ matrix.extra_flags }}
+
       - name: Test Player
+        if: matrix.browser != 'ChromeAndroid'
         timeout-minutes: 25
         shell: bash
         run: |
