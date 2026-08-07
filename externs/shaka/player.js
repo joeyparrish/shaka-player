@@ -1313,7 +1313,7 @@ shaka.extern.PersistentSessionMetadata;
  *   defaultAudioRobustnessForWidevine: string,
  *   defaultVideoRobustnessForWidevine: string,
  *   renewalIntervalSec: number,
- *   failureCallback: function(!shaka.util.Error),
+ *   failureCallback: function(!shaka.extern.Error),
  * }}
  *
  * @property {shaka.extern.RetryParameters} retryParameters
@@ -1417,7 +1417,7 @@ shaka.extern.PersistentSessionMetadata;
  *   (e.g., Widevine) are not supported.
  *   <br>
  *   Defaults to <code>0</code>.
- * @property {function(!shaka.util.Error)} failureCallback
+ * @property {function(!shaka.extern.Error)} failureCallback
  *   A callback function that is called when a DRM error occurs, such as
  *   LICENSE_REQUEST_FAILED. The callback receives a shaka.util.Error object.
  *   Set error.handled to true in the callback to prevent the error from
@@ -2027,7 +2027,7 @@ shaka.extern.SpeechToTextConfiguration;
 /**
  * @typedef {{
  *   retryParameters: shaka.extern.RetryParameters,
- *   failureCallback: function(!shaka.util.Error),
+ *   failureCallback: function(!shaka.extern.Error),
  *   rebufferingGoal: number,
  *   bufferingGoal: number,
  *   bufferBehind: number,
@@ -2080,7 +2080,7 @@ shaka.extern.SpeechToTextConfiguration;
  *
  * @property {shaka.extern.RetryParameters} retryParameters
  *   Retry parameters for segment requests.
- * @property {function(!shaka.util.Error)} failureCallback
+ * @property {function(!shaka.extern.Error)} failureCallback
  *   A callback to decide what to do on a streaming failure.  Default behavior
  *   is to retry on live streams and not on VOD.
  * @property {number} rebufferingGoal

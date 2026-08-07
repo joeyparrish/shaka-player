@@ -130,7 +130,7 @@ shaka.extern.ManifestParser = class {
  *   makeTextStreamsForClosedCaptions: function(shaka.extern.Manifest),
  *   onTimelineRegionAdded: function(shaka.extern.TimelineRegionInfo),
  *   onEvent: function(!Event),
- *   onError: function(!shaka.util.Error),
+ *   onError: function(!shaka.extern.Error),
  *   isLowLatencyMode: function():boolean,
  *   updateDuration: function(),
  *   newDrmInfo: function(shaka.extern.Stream),
@@ -163,7 +163,7 @@ shaka.extern.ManifestParser = class {
  *   Should be called when a new timeline region is added.
  * @property {function(!Event)} onEvent
  *   Should be called to raise events.
- * @property {function(!shaka.util.Error)} onError
+ * @property {function(!shaka.extern.Error)} onError
  *   Should be called when an error occurs.
  * @property {function():boolean} isLowLatencyMode
  *   Return true if low latency streaming mode is enabled.
