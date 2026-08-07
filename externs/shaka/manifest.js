@@ -297,8 +297,15 @@ shaka.extern.FetchCryptoKeysFunction;
 
 
 /**
- * SegmentIndex minimal API.
+ * The API of a SegmentIndex, as used by manifest parsers.
+ *
+ * This describes the surface that shaka.media.SegmentIndex provides to the
+ * parsers which create and update it.  It is declared here, rather than
+ * referring to shaka.media.SegmentIndex directly, so that these externs do not
+ * depend on the library.
+ *
  * @interface
+ * @extends {Iterable<?shaka.media.SegmentReference>}
  * @exportDoc
  */
 shaka.extern.SegmentIndex = class {
@@ -338,6 +345,122 @@ shaka.extern.SegmentIndex = class {
    * @exportDoc
    */
   getNumEvicted() {}
+
+  /**
+   * Releases the segment references held by this index.  Does nothing if the
+   * index has been marked immutable.
+   *
+   * @return {void}
+   * @exportDoc
+   */
+  release() {}
+
+  /**
+   * Offset all segment references by a fixed amount.
+   *
+   * @param {number} offset The amount to add to each segment's start and end
+   *   times.
+   * @return {void}
+   * @exportDoc
+   */
+  offset(offset) {}
+
+  /**
+   * Merges the given SegmentReferences.  Supports extending the original
+   * references only.  Will replace old references with equivalent new ones, and
+   * keep any unique old ones.
+   *
+   * @param {!Array<!shaka.media.SegmentReference>} references The list of
+   *   SegmentReferences, which must be sorted first by their start times
+   *   (ascending) and second by their end times (ascending).
+   * @return {void}
+   * @exportDoc
+   */
+  merge(references) {}
+
+  /**
+   * Merges the given references into this index, then evicts those which are
+   * no longer within the availability window.  Will not replace old references
+   * or interleave new ones.
+   *
+   * @param {!Array<!shaka.media.SegmentReference>} references The list of
+   *   SegmentReferences, which must be sorted first by their start times
+   *   (ascending) and second by their end times (ascending).
+   * @param {number} windowStart The start of the availability window to filter
+   *   out the references that are no longer available.
+   * @return {void}
+   * @exportDoc
+   */
+  mergeAndEvict(references, windowStart) {}
+
+  /**
+   * Removes all SegmentReferences that end before the given time.
+   *
+   * @param {number} time The time in seconds.
+   * @return {void}
+   * @exportDoc
+   */
+  evict(time) {}
+
+  /**
+   * Drops references that start after windowEnd, or end before windowStart,
+   * and contracts the last reference so that it ends at windowEnd.
+   *
+   * @param {number} windowStart
+   * @param {?number} windowEnd
+   * @param {boolean=} isNew Whether this is a new SegmentIndex and we shouldn't
+   *   update the number of evicted elements.
+   * @return {void}
+   * @exportDoc
+   */
+  fit(windowStart, windowEnd, isNew) {}
+
+  /**
+   * Returns an iterator positioned at the segment for the given time, or null
+   * if no segment is found at that time.
+   *
+   * @param {number} time
+   * @param {boolean=} allowNonIndependent
+   * @param {boolean=} reverse
+   * @return {?shaka.media.SegmentIterator}
+   * @exportDoc
+   */
+  getIteratorForTime(time, allowNonIndependent, reverse) {}
+
+  /**
+   * Returns true if this index holds no references.
+   *
+   * @return {boolean}
+   * @exportDoc
+   */
+  isEmpty() {}
+
+  /**
+   * Returns the earliest reference, or null if empty.
+   *
+   * @return {shaka.media.SegmentReference}
+   * @exportDoc
+   */
+  earliestReference() {}
+
+  /**
+   * Drops the first N references.  Used in early HLS synchronization; does not
+   * count as eviction.
+   *
+   * @param {number} n
+   * @return {void}
+   * @exportDoc
+   */
+  dropFirstReferences(n) {}
+
+  /**
+   * Iterates over all top-level segment references in this segment index.
+   *
+   * @param {function(!shaka.media.SegmentReference)} fn
+   * @return {void}
+   * @exportDoc
+   */
+  forEachTopLevelReference(fn) {}
 };
 
 
@@ -348,7 +471,7 @@ shaka.extern.SegmentIndex = class {
  *   groupId: ?string,
  *   createSegmentIndex: shaka.extern.CreateSegmentIndexFunction,
  *   closeSegmentIndex: (function()|undefined),
- *   segmentIndex: shaka.media.SegmentIndex,
+ *   segmentIndex: shaka.extern.SegmentIndex,
  *   mimeType: string,
  *   codecs: string,
  *   supplementalCodecs: string,
@@ -413,7 +536,7 @@ shaka.extern.SegmentIndex = class {
  * @property {(function()|undefined)} closeSegmentIndex
  *   <i>Optional.</i> <br>
  *   Closes the Stream's segmentIndex.
- * @property {shaka.media.SegmentIndex} segmentIndex
+ * @property {shaka.extern.SegmentIndex} segmentIndex
  *   <i>Required.</i> <br>
  *   May be null until createSegmentIndex() is complete.
  * @property {string} mimeType
