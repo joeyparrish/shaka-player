@@ -1683,9 +1683,9 @@ shaka.extern.HlsManifestConfiguration;
  *   fingerprintUri: string,
  *   namespaces: !Array<string>,
  *   authorizationToken: string,
- *   subscribeFilterType: shaka.config.MsfFilterType,
+ *   subscribeFilterType: shaka.extern.MsfFilterType,
  *   useFetchCatalog: boolean,
- *   version: shaka.config.MsfVersion,
+ *   version: shaka.extern.MsfVersion,
  *   catalogPreprocessor: function(!msfCatalog.Catalog),
  * }}
  *
@@ -1711,7 +1711,7 @@ shaka.extern.HlsManifestConfiguration;
  *   in WebTransport).
  *   <br>
  *   Defaults to <code>''</code>.
- * @property {shaka.config.MsfFilterType} subscribeFilterType
+ * @property {shaka.extern.MsfFilterType} subscribeFilterType
  *   The filter type used in MoQ SUBSCRIBE messages. Controls how the relay
  *   delivers data to the subscriber.
  *   <br>
@@ -1720,7 +1720,7 @@ shaka.extern.HlsManifestConfiguration;
  *   Use FETCH to retrieve the catalog instead of SUBSCRIBE.
  *   <br>
  *   Defaults to <code>false</code>.
- * @property {shaka.config.MsfVersion} version
+ * @property {shaka.extern.MsfVersion} version
  *   MoQ version used in the connection.
  *   <br>
  *   Defaults to <code>shaka.config.MsfVersion.AUTO</code>.
@@ -2068,7 +2068,7 @@ shaka.extern.SpeechToTextConfiguration;
  *   dontChooseCodecs: boolean,
  *   shouldFixTimestampOffset: boolean,
  *   avoidEvictionOnQuotaExceededError: boolean,
- *   crossBoundaryStrategy: shaka.config.CrossBoundaryStrategy,
+ *   crossBoundaryStrategy: shaka.extern.CrossBoundaryStrategy,
  *   returnToEndOfLiveWindowWhenOutside: boolean,
  *   stopFetchingOnPause: boolean,
  *   clampAppendWindowToDuration: boolean,
@@ -2309,9 +2309,12 @@ shaka.extern.SpeechToTextConfiguration;
  *   Avoid evict content on QuotaExceededError.
  *   <br>
  *   Defaults to <code>false</code>.
- * @property {shaka.config.CrossBoundaryStrategy} crossBoundaryStrategy
+ * @property {shaka.extern.CrossBoundaryStrategy} crossBoundaryStrategy
  *   Allows MSE to be reset when crossing a boundary. Optionally, we can stop
  *   resetting MSE when MSE passed an encrypted boundary.
+ *   <br>
+ *   Values come from the <code>shaka.config.CrossBoundaryStrategy</code> enum.
+ *   <br>
  *   Defaults to <code>KEEP</code> except on Tizen 3 where the default value
  *   is <code>RESET_TO_ENCRYPTED</code> and WebOS 3 where the default value
  *   is <code>RESET</code>.
@@ -2433,7 +2436,7 @@ shaka.extern.ModifyPreselectionSegmentCallback;
 
 /**
  * @typedef {{
- *   codecSwitchingStrategy: shaka.config.CodecSwitchingStrategy,
+ *   codecSwitchingStrategy: shaka.extern.CodecSwitchingStrategy,
  *   addExtraFeaturesToSourceBuffer: function(string): string,
  *   forceTransmux: boolean,
  *   insertFakeEncryptionInInit: boolean,
@@ -2451,9 +2454,12 @@ shaka.extern.ModifyPreselectionSegmentCallback;
  * @description
  *   Media source configuration.
  *
- * @property {shaka.config.CodecSwitchingStrategy} codecSwitchingStrategy
+ * @property {shaka.extern.CodecSwitchingStrategy} codecSwitchingStrategy
  *   Allow codec switching strategy. SMOOTH loading uses
  *   SourceBuffer.changeType. RELOAD uses cycling of MediaSource.
+ *   <br>
+ *   Values come from the <code>shaka.config.CodecSwitchingStrategy</code>
+ *   enum.
  *   <br>
  *   Defaults to SMOOTH if SMOOTH codec switching is supported, RELOAD
  *   overwise.
@@ -3104,7 +3110,7 @@ shaka.extern.OfflineConfiguration;
 /**
  * @typedef {{
  *   fontScaleFactor: number,
- *   positionArea: shaka.config.PositionArea,
+ *   positionArea: shaka.extern.PositionArea,
  *   subtitleDelay: number,
  *   suspendRenderingWhenHidden: boolean,
  * }}
@@ -3116,11 +3122,13 @@ shaka.extern.OfflineConfiguration;
  *   The font scale factor used to increase or decrease the font size.
  *   <br>
  *   Defaults to <code>1</code>.
- * @property {shaka.config.PositionArea} positionArea
+ * @property {shaka.extern.PositionArea} positionArea
  *   The region within the viewing area where the subtitles are to be
  *   positioned. The default value indicates that they are positioned where
  *   the subtitle defines it, otherwise they are overwritten with the given
  *   position.
+ *   <br>
+ *   Values come from the <code>shaka.config.PositionArea</code> enum.
  *   <br>
  *   Defaults to <code>''</code>.
  * @property {number} subtitleDelay
@@ -3384,7 +3392,7 @@ shaka.extern.PlayerConfiguration;
  * @typedef {{
  *   preloadNextUrlWindow: number,
  *   preloadPrevItem: boolean,
- *   repeatMode: shaka.config.RepeatMode
+ *   repeatMode: shaka.extern.RepeatMode
  * }}
  *
  * @description
@@ -3398,7 +3406,7 @@ shaka.extern.PlayerConfiguration;
  *   Defaults to <code>Infinity</code>.
  * @property {boolean} preloadPrevItem
  *   Defaults to <code>true</code>.
- * @property {shaka.config.RepeatMode} repeatMode
+ * @property {shaka.extern.RepeatMode} repeatMode
  *   Controls behavior of the queue when all items have been played.
  *   <br>
  *   Defaults to {@link shaka.config.RepeatMode#OFF}.

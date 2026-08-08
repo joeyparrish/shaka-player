@@ -75,7 +75,7 @@ shaka.extern.AdaptationSetCriteria.Factory;
  *   videoLabel: string,
  *   preferredAudioCodecs: !Array<string>,
  *   preferredAudioChannelCount: number,
- *   codecSwitchingStrategy: shaka.config.CodecSwitchingStrategy,
+ *   codecSwitchingStrategy: shaka.extern.CodecSwitchingStrategy,
  *   audioCodec: string,
  *   activeAudioCodec: string,
  *   activeAudioChannelCount: number,
@@ -130,8 +130,11 @@ shaka.extern.AdaptationSetCriteria.Factory;
  *   Deprecated. Use preferredAudio instead.
  *   The preferred audio channel count to filter variants. Populated from
  *   preferredAudio[0].channelCount.
- * @property {shaka.config.CodecSwitchingStrategy} codecSwitchingStrategy
+ * @property {shaka.extern.CodecSwitchingStrategy} codecSwitchingStrategy
  *   The codec switching strategy used to filter variants.
+ *   <br>
+ *   Values come from the <code>shaka.config.CodecSwitchingStrategy</code>
+ *   enum.
  * @property {string} audioCodec
  *   The audio codec used to filter variants.
  * @property {string} activeAudioCodec

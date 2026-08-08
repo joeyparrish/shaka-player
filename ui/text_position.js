@@ -61,7 +61,8 @@ shaka.ui.TextPosition = class extends shaka.ui.TextStyleMenu {
   /** @override */
   getCurrentValueLabel() {
     return this.getNameOfPosition_(
-        this.player.getConfiguration().textDisplayer.positionArea);
+        /** @type {shaka.config.PositionArea} */ (
+          this.player.getConfiguration().textDisplayer.positionArea));
   }
 
   /** @override */
