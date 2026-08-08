@@ -11,6 +11,17 @@
 
 
 /**
+ * Values must come from the shaka.media.ManifestParser.AccessibilityPurpose
+ * runtime enum.
+ *
+ * TODO(TS): Restore as a literal union type when migrating to TypeScript.
+ *
+ * @typedef {string}
+ */
+shaka.extern.AccessibilityPurpose;
+
+
+/**
  * @typedef {{
  *   presentationTimeline: !shaka.media.PresentationTimeline,
  *   variants: !Array<shaka.extern.Variant>,
@@ -496,7 +507,7 @@ shaka.extern.SegmentIndex = class {
  *   dependencyStream: ?shaka.extern.Stream,
  *   emsgSchemeIdUris: ?Array<string>,
  *   roles: !Array<string>,
- *   accessibilityPurpose: ?shaka.media.ManifestParser.AccessibilityPurpose,
+ *   accessibilityPurpose: ?shaka.extern.AccessibilityPurpose,
  *   forced: boolean,
  *   channelsCount: ?number,
  *   audioSamplingRate: ?number,
@@ -625,9 +636,12 @@ shaka.extern.SegmentIndex = class {
  * @property {!Array<string>} roles
  *   The roles of the stream as they appear on the manifest,
  *   e.g. 'main', 'caption', or 'commentary'.
- * @property {?shaka.media.ManifestParser.AccessibilityPurpose
+ * @property {?shaka.extern.AccessibilityPurpose
  *           } accessibilityPurpose
  *   The DASH accessibility descriptor, if one was provided for this stream.
+ *   <br>
+ *   Values come from the
+ *   <code>shaka.media.ManifestParser.AccessibilityPurpose</code> enum.
  * @property {boolean} forced
  *   <i>Defaults to false.</i> <br>
  *   Whether the stream set was forced

@@ -281,7 +281,7 @@ shaka.extern.BufferedInfo;
  *   videoRoles: Array<string>,
  *   audioLanguage: ?string,
  *   videoLanguage: ?string,
- *   accessibilityPurpose: ?shaka.media.ManifestParser.AccessibilityPurpose,
+ *   accessibilityPurpose: ?shaka.extern.AccessibilityPurpose,
  *   forced: boolean,
  *   videoId: ?number,
  *   audioId: ?number,
@@ -380,10 +380,13 @@ shaka.extern.BufferedInfo;
  *   The language of the video in the track, e.g. <code>'und'</code> or
  *   <code>'sgn-US'</code>. Will be null for text tracks or variant tracks
  *   without video.
- * @property {?shaka.media.ManifestParser.AccessibilityPurpose
+ * @property {?shaka.extern.AccessibilityPurpose
  *           } accessibilityPurpose
  *   The DASH accessibility descriptor, if one was provided for this track.
  *   For text tracks, this describes the text; otherwise, this is for the audio.
+ *   <br>
+ *   Values come from the
+ *   <code>shaka.media.ManifestParser.AccessibilityPurpose</code> enum.
  * @property {boolean} forced
  *   True indicates that this in the forced text language for the content.
  *   This flag is based on signals from the manifest.
@@ -439,7 +442,7 @@ shaka.extern.Track;
  *   codecs: ?string,
  *   primary: boolean,
  *   roles: !Array<string>,
- *   accessibilityPurpose: ?shaka.media.ManifestParser.AccessibilityPurpose,
+ *   accessibilityPurpose: ?shaka.extern.AccessibilityPurpose,
  *   channelsCount: ?number,
  *   audioSamplingRate: ?number,
  *   spatialAudio: boolean,
@@ -474,9 +477,12 @@ shaka.extern.Track;
  * @property {!Array<string>} roles
  *   The roles of the track, e.g. <code>'main'</code>, <code>'caption'</code>,
  *   or <code>'commentary'</code>.
- * @property {?shaka.media.ManifestParser.AccessibilityPurpose
+ * @property {?shaka.extern.AccessibilityPurpose
  *           } accessibilityPurpose
  *   The DASH accessibility descriptor, if one was provided for this track.
+ *   <br>
+ *   Values come from the
+ *   <code>shaka.media.ManifestParser.AccessibilityPurpose</code> enum.
  * @property {?number} channelsCount
  *   The count of the audio track channels.
  * @property {?number} audioSamplingRate
@@ -506,7 +512,7 @@ shaka.extern.AudioTrack;
  *   codecs: ?string,
  *   primary: boolean,
  *   roles: !Array<string>,
- *   accessibilityPurpose: ?shaka.media.ManifestParser.AccessibilityPurpose,
+ *   accessibilityPurpose: ?shaka.extern.AccessibilityPurpose,
  *   forced: boolean,
  *   originalTextId: ?string,
  *   originalLanguage: ?string
@@ -549,9 +555,12 @@ shaka.extern.AudioTrack;
  * @property {!Array<string>} roles
  *   The roles of the track, e.g. <code>'main'</code>, <code>'caption'</code>,
  *   or <code>'commentary'</code>.
- * @property {?shaka.media.ManifestParser.AccessibilityPurpose
+ * @property {?shaka.extern.AccessibilityPurpose
  *           } accessibilityPurpose
  *   The DASH accessibility descriptor, if one was provided for this track.
+ *   <br>
+ *   Values come from the
+ *   <code>shaka.media.ManifestParser.AccessibilityPurpose</code> enum.
  * @property {boolean} forced
  *   True indicates that this in the forced text language for the content.
  *   This flag is based on signals from the manifest.
