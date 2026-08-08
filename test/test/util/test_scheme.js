@@ -71,7 +71,7 @@ shaka.test.TestScheme = class {
    *
    * @param {string} uri
    * @param {shaka.extern.Request} request
-   * @param {shaka.net.NetworkingEngine.RequestType=} requestType
+   * @param {shaka.extern.RequestType=} requestType
    * @return {!shaka.extern.IAbortableOperation.<shaka.extern.Response>}
    */
   static plugin(uri, request, requestType) {

@@ -11,6 +11,28 @@
 
 
 /**
+ * Values must come from the shaka.net.NetworkingEngine.RequestType runtime
+ * enum.
+ *
+ * TODO(TS): Restore as a literal union type when migrating to TypeScript.
+ *
+ * @typedef {number}
+ */
+shaka.extern.RequestType;
+
+
+/**
+ * Values must come from the shaka.net.NetworkingEngine.AdvancedRequestType
+ * runtime enum.
+ *
+ * TODO(TS): Restore as a literal union type when migrating to TypeScript.
+ *
+ * @typedef {number}
+ */
+shaka.extern.AdvancedRequestType;
+
+
+/**
  * @typedef {{
  *   maxAttempts: number,
  *   baseDelay: number,
@@ -173,7 +195,7 @@ shaka.extern.Response;
 /**
  * @typedef {!function(string,
  *                     shaka.extern.Request,
- *                     shaka.net.NetworkingEngine.RequestType,
+ *                     shaka.extern.RequestType,
  *                     shaka.extern.ProgressUpdated,
  *                     shaka.extern.HeadersReceived,
  *                     shaka.extern.SchemePluginConfig):
@@ -239,7 +261,7 @@ shaka.extern.HeadersReceived;
 
 /**
  * @typedef {{
- *   type: (shaka.net.NetworkingEngine.AdvancedRequestType|undefined),
+ *   type: (shaka.extern.AdvancedRequestType|undefined),
  *   stream: (shaka.extern.Stream|undefined),
  *   segment: (shaka.media.SegmentReference|undefined),
  *   isPreload: (boolean|undefined)
@@ -248,8 +270,11 @@ shaka.extern.HeadersReceived;
  * @description
  * Defines contextual data about a request
  *
- * @property {shaka.net.NetworkingEngine.AdvancedRequestType=} type
- *   The advanced type
+ * @property {shaka.extern.AdvancedRequestType=} type
+ *   The advanced type.
+ *   <br>
+ *   Values come from the
+ *   <code>shaka.net.NetworkingEngine.AdvancedRequestType</code> enum.
  * @property {shaka.extern.Stream=} stream
  *   A reference to the Stream object
  * @property {shaka.media.SegmentReference=} segment
@@ -273,7 +298,7 @@ shaka.extern.RequestContext;
  * attempt. You can check the attempt parameter on the request object to see
  * which attempt this filter is being called on.
  *
- * @typedef {!function(shaka.net.NetworkingEngine.RequestType,
+ * @typedef {!function(shaka.extern.RequestType,
  *                     shaka.extern.Request,
  *                     shaka.extern.RequestContext=):
  *           (Promise|undefined)}
@@ -290,7 +315,7 @@ shaka.extern.RequestFilter;
  * provide additional information about the request. A response filter can run
  * asynchronously by returning a promise.
  *
- * @typedef {!function(shaka.net.NetworkingEngine.RequestType,
+ * @typedef {!function(shaka.extern.RequestType,
  *                     shaka.extern.Response,
  *                     shaka.extern.RequestContext=):
  *            (Promise|undefined)}

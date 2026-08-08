@@ -68,7 +68,7 @@ shaka.test.FakeNetworkingEngine = class {
   }
 
   /**
-   * @param {shaka.net.NetworkingEngine.RequestType} type
+   * @param {shaka.extern.RequestType} type
    * @param {shaka.extern.Request} request
    * @return {!shaka.extern.IAbortableOperation.<shaka.extern.Response>}
    * @private
@@ -193,7 +193,7 @@ shaka.test.FakeNetworkingEngine = class {
    * Expects that a request for the given segment has occurred.
    *
    * @param {string} uri
-   * @param {shaka.net.NetworkingEngine.RequestType} type
+   * @param {shaka.extern.RequestType} type
    * @param {shaka.extern.RequestContext=} context
    */
   expectRequest(uri, type, context) {
@@ -205,7 +205,7 @@ shaka.test.FakeNetworkingEngine = class {
    * Expects that no request for the given segment has occurred.
    *
    * @param {string} uri
-   * @param {shaka.net.NetworkingEngine.RequestType} type
+   * @param {shaka.extern.RequestType} type
    * @param {shaka.extern.RequestContext=} context
    */
   expectNoRequest(uri, type, context) {
@@ -325,7 +325,7 @@ shaka.test.FakeNetworkingEngine = class {
    *
    * @param {!Object} requestSpy
    * @param {string} uri
-   * @param {shaka.net.NetworkingEngine.RequestType} type
+   * @param {shaka.extern.RequestType} type
    * @param {shaka.extern.RequestContext=} context
    */
   static expectRequest(requestSpy, uri, type, context) {
@@ -346,7 +346,7 @@ shaka.test.FakeNetworkingEngine = class {
    *
    * @param {!Object} requestSpy
    * @param {string} uri
-   * @param {shaka.net.NetworkingEngine.RequestType} type
+   * @param {shaka.extern.RequestType} type
    * @param {shaka.extern.RequestContext=} context
    */
   static expectNoRequest(requestSpy, uri, type, context) {

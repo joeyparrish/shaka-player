@@ -241,7 +241,7 @@ shakaAssets.lastUplynkPrefix = '';
  * This allows us to get the license prefix that is necessary
  * to later generate a proper license response.
  *
- * @param {shaka.net.NetworkingEngine.RequestType} type
+ * @param {shaka.extern.RequestType} type
  * @param {shaka.extern.Response} response
  */
 shakaAssets.UplynkResponseFilter = (type, response) => {
@@ -260,7 +260,7 @@ shakaAssets.UplynkResponseFilter = (type, response) => {
 /**
  * A license request filter for VDMS Uplynk license requests.
  *
- * @param {shaka.net.NetworkingEngine.RequestType} type
+ * @param {shaka.extern.RequestType} type
  * @param {shaka.extern.Request} request
  */
 shakaAssets.UplynkRequestFilter = (type, request) => {

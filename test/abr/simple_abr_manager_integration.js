@@ -133,7 +133,7 @@ describe('SimpleAbrManager (integration)', () => {
    *
    * @param {string} uri
    * @param {shaka.extern.Request} request
-   * @param {shaka.net.NetworkingEngine.RequestType=} requestType
+   * @param {shaka.extern.RequestType=} requestType
    * @return {!shaka.extern.IAbortableOperation<shaka.extern.Response>}
    */
   function schemePlugin(uri, request, requestType) {
@@ -173,7 +173,7 @@ describe('SimpleAbrManager (integration)', () => {
    * Response filter that sleeps so the apparent throughput matches
    * `currentTargetBps`.
    *
-   * @param {shaka.net.NetworkingEngine.RequestType} type
+   * @param {shaka.extern.RequestType} type
    * @param {shaka.extern.Response} response
    * @param {shaka.extern.RequestContext=} context
    * @return {!Promise}
