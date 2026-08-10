@@ -38,19 +38,19 @@ shaka.extern.RestrictionInfo;
 shaka.extern.Error = class {
   constructor() {
     /**
-     * @type {shaka.util.Error.Severity}
+     * @type {shaka.extern.Error.Severity}
      * @exportDoc
      */
     this.severity;
 
     /**
-     * @const {shaka.util.Error.Category}
+     * @const {shaka.extern.Error.Category}
      * @exportDoc
      */
     this.category;
 
     /**
-     * @const {shaka.util.Error.Code}
+     * @const {shaka.extern.Error.Code}
      * @exportDoc
      */
     this.code;
@@ -68,3 +68,33 @@ shaka.extern.Error = class {
     this.handled;
   }
 };
+
+
+/**
+ * Values must come from the shaka.util.Error.Severity runtime enum.
+ *
+ * TODO(TS): Restore as a literal union type when migrating to TypeScript.
+ *
+ * @typedef {number}
+ */
+shaka.extern.Error.Severity;
+
+
+/**
+ * Values must come from the shaka.util.Error.Category runtime enum.
+ *
+ * TODO(TS): Restore as a literal union type when migrating to TypeScript.
+ *
+ * @typedef {number}
+ */
+shaka.extern.Error.Category;
+
+
+/**
+ * Values must come from the shaka.util.Error.Code runtime enum.
+ *
+ * TODO(TS): Restore as a literal union type when migrating to TypeScript.
+ *
+ * @typedef {number}
+ */
+shaka.extern.Error.Code;
