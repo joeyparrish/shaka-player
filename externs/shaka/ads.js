@@ -419,11 +419,18 @@ shaka.extern.IAdManager.Factory;
 /**
  * Interface for Ad objects.
  *
- * @extends {shaka.util.IReleasable}
  * @interface
  * @exportDoc
  */
 shaka.extern.IAd = class {
+  /**
+   * Request that this object release all internal references.
+   *
+   * @return {void}
+   * @exportDoc
+   */
+  release() {}
+
   /**
    * @return {boolean}
    */
