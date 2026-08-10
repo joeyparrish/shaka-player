@@ -9,6 +9,28 @@
  */
 
 /**
+ * A set of variants that can be adapted between.
+ *
+ * This describes the surface that shaka.media.AdaptationSet exposes to the
+ * Player.  It is declared here, rather than referring to
+ * shaka.media.AdaptationSet directly, so that these externs do not depend on
+ * the library.
+ *
+ * @interface
+ * @exportDoc
+ */
+shaka.extern.AdaptationSet = class {
+  /**
+   * The variants in this adaptation set.
+   *
+   * @return {!Iterable<shaka.extern.Variant>}
+   * @exportDoc
+   */
+  values() {}
+};
+
+
+/**
  * An adaptation set criteria is a unit of logic that can take a set of
  * variants and return a subset of variants that should (and can) be
  * adapted between.
@@ -22,7 +44,7 @@ shaka.extern.AdaptationSetCriteria = class {
    * adapted between.
    *
    * @param {!Array<shaka.extern.Variant>} variants
-   * @return {!shaka.media.AdaptationSet}
+   * @return {!shaka.extern.AdaptationSet}
    * @exportDoc
    */
   create(variants) {}
@@ -46,7 +68,7 @@ shaka.extern.AdaptationSetCriteria = class {
   /**
    * Return the result of last create call.
    *
-   * @return {?shaka.media.AdaptationSet}
+   * @return {?shaka.extern.AdaptationSet}
    * @exportDoc
    */
   getLastAdaptationSet() {}

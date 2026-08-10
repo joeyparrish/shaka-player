@@ -2173,7 +2173,7 @@ describe('AdaptationSetCriteria', () => {
   });
 
   /**
-   * @param {!shaka.media.AdaptationSet} set
+   * @param {!shaka.extern.AdaptationSet} set
    * @param {!Array<T>} array
    * @template T
    */
