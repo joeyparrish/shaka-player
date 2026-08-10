@@ -11,6 +11,65 @@
 
 
 /**
+ * The CMSD data made available to an AbrManager.
+ *
+ * This describes the surface that shaka.util.CmsdManager exposes to ABR
+ * plugins.  It is declared here, rather than referring to
+ * shaka.util.CmsdManager directly, so that these externs do not depend on the
+ * library.
+ *
+ * @interface
+ * @exportDoc
+ */
+shaka.extern.CmsdManager = class {
+  /**
+   * Returns the max bitrate in bits per second. If there is no max bitrate or
+   * it's not enabled, it returns null.
+   *
+   * @return {?number}
+   * @exportDoc
+   */
+  getMaxBitrate() {}
+
+  /**
+   * Returns the estimated throughput in bits per second. If there is no
+   * estimated throughput or it's not enabled, it returns null.
+   *
+   * @return {?number}
+   * @exportDoc
+   */
+  getEstimatedThroughput() {}
+
+  /**
+   * Returns the response delay in milliseconds. If there is no response delay
+   * or it's not enabled, it returns null.
+   *
+   * @return {?number}
+   * @exportDoc
+   */
+  getResponseDelay() {}
+
+  /**
+   * Returns the RTT in milliseconds. If there is no RTT or it's not enabled,
+   * it returns null.
+   *
+   * @return {?number}
+   * @exportDoc
+   */
+  getRoundTripTime() {}
+
+  /**
+   * Gets the current bandwidth estimate.
+   *
+   * @param {number} defaultEstimate
+   * @return {number} The bandwidth estimate in bits per second.
+   * @exportDoc
+   */
+  getBandwidthEstimate(defaultEstimate) {}
+};
+
+
+/**
  * An object which selects Streams from a set of possible choices.  This also
  * watches for system changes to automatically adapt for the current streaming
  * requirements.  For example, when the network slows down, this class is in
@@ -145,7 +204,7 @@ shaka.extern.AbrManager = class {
   /**
    * Set CMSD manager.
    *
-   * @param {shaka.util.CmsdManager} cmsdManager
+   * @param {shaka.extern.CmsdManager} cmsdManager
    * @exportDoc
    */
   setCmsdManager(cmsdManager) {}
