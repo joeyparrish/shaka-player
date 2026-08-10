@@ -199,7 +199,7 @@ shaka.test.TSVodStreamGenerator = class {
   }
 
   /**
-   * @param {!shaka.util.DataViewReader} reader
+   * @param {!shaka.extern.DataViewReader} reader
    * @return {number}
    * @private
    */

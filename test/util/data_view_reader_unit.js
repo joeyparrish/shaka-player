@@ -16,13 +16,13 @@ describe('DataViewReader', () => {
   const data2 =
       new Uint8Array([0xde, 0xad, 0xbe, 0xef, 0xff, 0xff, 0x01, 0x00]);
 
-  /** @type {!shaka.util.DataViewReader} */
+  /** @type {!shaka.extern.DataViewReader} */
   let bigEndianReader;
-  /** @type {!shaka.util.DataViewReader} */
+  /** @type {!shaka.extern.DataViewReader} */
   let littleEndianReader;
-  /** @type {!shaka.util.DataViewReader} */
+  /** @type {!shaka.extern.DataViewReader} */
   let bigEndianReader2;
-  /** @type {!shaka.util.DataViewReader} */
+  /** @type {!shaka.extern.DataViewReader} */
   let littleEndianReader2;
 
   beforeEach(() => {
