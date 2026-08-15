@@ -616,6 +616,12 @@ async function setupTestEnvironment() {
   workAroundLegacyEdgePromiseIssues();
   workAroundLabCrashes();
 
+  // Install this before anything can touch IndexedDB, so the trace covers the
+  // whole run.
+  if (getClientArg('idbTrace')) {
+    shaka.test.IdbTracer.install();
+  }
+
   const logLevel = getClientArg('logLevel');
   if (logLevel) {
     shaka.log.setLevel(Number(logLevel));

@@ -268,6 +268,14 @@ class Launcher:
         metavar='KEY_SYSTEM_ID=LICENSE_SERVER_URI',
         action=_HandleKeyValuePairs)
     running_commands.add_argument(
+        '--idb-trace',
+        help='Log the sequence and timing of every IndexedDB operation, and '
+             'dump a trace to the console if the database stops responding. '
+             'Used to investigate the macOS-only IndexedDB hang.',
+        dest='idb_trace',
+        action='store_true',
+        default=False)
+    running_commands.add_argument(
         '--test-timeout',
         help='Sets the test timeout value [ms] (default %(default)s)',
         dest='test_timeout',
@@ -394,6 +402,7 @@ class Launcher:
       'grid_config',
       'hostname',
       'html_coverage_report',
+      'idb_trace',
       'log_level',
       'logging',
       'no_browsers',

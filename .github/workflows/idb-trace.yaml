@@ -1,0 +1,160 @@
+name: IndexedDB Trace
+
+# A diagnostic harness for the macOS-only IndexedDB hang, in which every async
+# IDB request stops completing partway through the offline storage tests and
+# does not recover until the browser restarts.
+#
+# This runs the offline/storage tests with --idb-trace, which records the
+# sequence and timing of every IDB operation and dumps the trace to the console
+# once the database stops responding.  The goal is a trace faithful enough to
+# replay as a standalone, Shaka-free reproduction.
+#
+# Manual trigger only.  Nothing here runs on push, PR, or a schedule, so it
+# cannot affect normal CI signal.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "The ref to build and test."
+        required: false
+      filter:
+        description: "Test filter.  'offline' expands to all storage tests."
+        required: false
+        default: "offline"
+      attempts:
+        description: "Times to repeat the run in each job, to catch a rare hang."
+        required: false
+        default: "1"
+      test_timeout:
+        description: >
+          Per-test timeout [ms].  Lower than the 120s default on purpose: once
+          the database wedges, every remaining test burns a full timeout in
+          beforeEach and another in the body, which drags the run out for no
+          added information.  Healthy storage tests take about a second.
+        required: false
+        default: "30000"
+
+jobs:
+  build:
+    name: Build Player
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - name: Build Player
+        timeout-minutes: 20
+        run: python3 build/all.py --only-es5
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: player-build
+          path: dist/
+
+  trace:
+    needs: build
+    strategy:
+      matrix:
+        include:
+          # The three macOS Chromium browsers that exhibit the hang.
+          - os: macos-latest
+            browser: Chrome
+            extra_flags: "--running_in_vm"
+          - os: macos-latest
+            browser: Edge
+            extra_flags: "--running_in_vm"
+          - os: macos-latest
+            browser: Opera
+            extra_flags: "--running_in_vm"
+
+          # Control: same code, same tests, on a platform where storage passes.
+          # This gives us a healthy trace to diff a wedged one against.
+          - os: ubuntu-latest
+            browser: Chrome
+            extra_flags: "--use-xvfb --running_in_vm"
+
+      fail-fast: false
+
+    name: ${{ matrix.os }} ${{ matrix.browser }}
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      # "Chrome for Testing" shadows real Chrome and lacks basic codecs.
+      - name: 'Delete "Chrome for Testing" on Mac'
+        timeout-minutes: 5
+        if: matrix.os == 'macos-latest' && matrix.browser == 'Chrome'
+        run: sudo rm -rf /Applications/Google\ Chrome\ for\ Testing.app
+
+      - name: 'Install Edge on Mac'
+        timeout-minutes: 5
+        if: matrix.os == 'macos-latest' && matrix.browser == 'Edge'
+        run: brew install --cask microsoft-edge
+
+      - name: 'Install Opera on Mac'
+        timeout-minutes: 5
+        if: matrix.os == 'macos-latest' && matrix.browser == 'Opera'
+        run: brew install --cask opera
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: player-build
+          path: dist/
+
+      # continue-on-error so that the trace is still uploaded when the tests
+      # fail, which is the case we actually care about.
+      - name: Trace IndexedDB
+        id: trace
+        timeout-minutes: 60
+        continue-on-error: true
+        shell: bash
+        run: |
+          for i in $(seq 1 ${{ inputs.attempts || 1 }}); do
+            echo "=== Attempt $i ==="
+            python3 build/test.py \
+              --no-build \
+              --browsers "${{ matrix.browser }}" \
+              --filter "${{ inputs.filter || 'offline' }}" \
+              --idb-trace \
+              --test-timeout "${{ inputs.test_timeout || 30000 }}" \
+              --reporters spec \
+              ${{ matrix.extra_flags }} \
+              2>&1 | tee -a idb-trace.log
+          done
+
+      # The console view truncates long lines and long logs, and the trace is
+      # both.  Keep the raw log as an artifact.
+      - name: Upload trace log
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: idb-trace-${{ matrix.browser }}-${{ matrix.os }}
+          path: idb-trace.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Report wedge status
+        if: always()
+        shell: bash
+        run: |
+          if grep -q "WEDGE DETECTED" idb-trace.log; then
+            echo "::warning::IndexedDB wedge reproduced on ${{ matrix.os }} ${{ matrix.browser }}"
+            grep -m5 "WEDGE DETECTED" idb-trace.log
+          else
+            echo "No wedge detected in this run."
+          fi
