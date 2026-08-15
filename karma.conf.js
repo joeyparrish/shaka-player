@@ -363,8 +363,10 @@ module.exports = (config) => {
       // an iframe involved in the test framework.
       useIframe: false,  // No iframe
       runInParent: true,  // No new window
-      // Only capture the client's logs if the settings want logging.
-      captureConsole: !!settings.logging && settings.logging != 'none',
+      // Only capture the client's logs if the settings want logging.  The
+      // IndexedDB tracer reports through the console, so it needs this on.
+      captureConsole: (!!settings.logging && settings.logging != 'none') ||
+          !!settings.idb_trace,
       // |args| must be an array; pass a key-value map as the sole client
       // argument.
       args: [{
@@ -399,6 +401,9 @@ module.exports = (config) => {
 
         // Overrides the default test timeout value.
         testTimeout: settings.test_timeout,
+
+        // Trace IndexedDB operations to diagnose the macOS-only hang.
+        idbTrace: !!settings.idb_trace,
 
         // True if the test.py --grid_config option was used.
         runningInLab: !!settings.grid_config,
