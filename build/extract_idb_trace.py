@@ -30,8 +30,10 @@ import re
 import sys
 
 
-CHUNK_RE = re.compile(r'\[idb-trace\] CHUNK (\d+)/(\d+) (\[.*\])')
-SUMMARY_RE = re.compile(r'\[idb-trace\] SUMMARY (\{.*\})')
+SESSION = r'(?:([0-9a-z]{4,12}) )?'
+CHUNK_RE = re.compile(r'\[idb-trace\] CHUNK ' + SESSION + r'(\d+)/(\d+) (\[.*\])')
+SUMMARY_RE = re.compile(r'\[idb-trace\] SUMMARY ' + SESSION + r'(\{.*\})')
+INSTALL_RE = re.compile(r'\[idb-trace\] Installed')
 
 
 def strip_tail(text, closer):
@@ -61,17 +63,27 @@ def extract(path):
     A tuple of (records, summaries).
   """
   # A run dumps once when the watchdog spots a hang and again when it ends, so
-  # the same record can appear twice.  Key by sequence number and keep the last
-  # copy seen, which reflects the operation's final state.
-  by_seq = {}
+  # the same record can appear twice; key by sequence number and keep the last
+  # copy, which reflects the operation's final state.
+  #
+  # Sequence numbers restart in each browser session, so a log holding several
+  # runs (test.py --runs) repeats them.  Key by session as well.  Newer logs
+  # tag every dump with a session id; for older ones, fall back to counting the
+  # tracer's install banner, which marks the start of each session.
+  by_key = {}
   extras = []
   summaries = []
+  install_count = 0
 
   with open(path, 'r', errors='replace') as f:
     for line in f:
+      if INSTALL_RE.search(line):
+        install_count += 1
+        continue
+
       match = SUMMARY_RE.search(line)
       if match:
-        blob = strip_tail(match.group(1), '}')
+        blob = strip_tail(match.group(2), '}')
         try:
           summaries.append(json.loads(blob))
         except json.JSONDecodeError as e:
@@ -82,20 +94,23 @@ def extract(path):
       if not match:
         continue
 
-      index = int(match.group(1))
+      session = match.group(1) or ('run%d' % install_count)
+      index = int(match.group(2))
       try:
-        chunk = json.loads(strip_tail(match.group(3), ']'))
+        chunk = json.loads(strip_tail(match.group(4), ']'))
       except json.JSONDecodeError as e:
         print('Skipping malformed chunk %d: %s' % (index, e), file=sys.stderr)
         continue
 
       for record in chunk:
         if 'seq' in record:
-          by_seq[record['seq']] = record
+          record.setdefault('session', session)
+          by_key[(session, record['seq'])] = record
         else:
           extras.append(record)
 
-  records = sorted(by_seq.values(), key=lambda r: r['seq']) + extras
+  records = sorted(by_key.values(),
+                   key=lambda r: (r['session'], r['seq'])) + extras
   return records, summaries
 
 

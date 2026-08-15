@@ -81,7 +81,13 @@ shaka.test.IdbTracer = class {
 
     T.watchdog_ = setInterval(() => T.checkForWedge_(), 500);
 
-    console.log('[idb-trace] Installed IndexedDB tracer.');
+    // Sequence numbers restart at 1 in every browser session, so a log that
+    // holds more than one run (test.py --runs) would have colliding sequence
+    // numbers.  Tag each dump with a session id to keep the runs apart.
+    T.session_ = Math.random().toString(36).slice(2, 10);
+
+    console.log('[idb-trace] Installed IndexedDB tracer. session=' +
+                T.session_);
   }
 
   /**
@@ -104,17 +110,18 @@ shaka.test.IdbTracer = class {
       pending: pending.slice(0, 20),
       tail: T.records_.slice(-50),
     };
-    console.log('[idb-trace] SUMMARY ' + T.stringify_(summary));
+    console.log('[idb-trace] SUMMARY ' + T.session_ + ' ' +
+                T.stringify_(summary));
 
     const total = Math.ceil(T.records_.length / T.config_.chunkSize);
-    console.log('[idb-trace] BEGIN chunks=' + total +
+    console.log('[idb-trace] BEGIN session=' + T.session_ + ' chunks=' + total +
                 ' records=' + T.records_.length);
     let index = 0;
     for (let i = 0; i < T.records_.length; i += T.config_.chunkSize) {
       const chunk = T.records_.slice(i, i + T.config_.chunkSize);
       index++;
-      console.log('[idb-trace] CHUNK ' + index + '/' + total + ' ' +
-                  T.stringify_(chunk));
+      console.log('[idb-trace] CHUNK ' + T.session_ + ' ' + index + '/' +
+                  total + ' ' + T.stringify_(chunk));
     }
     console.log('[idb-trace] END');
   }
@@ -848,6 +855,9 @@ shaka.test.IdbTracer.currentSpec_ = null;
 
 /** @private {?Object} */
 shaka.test.IdbTracer.specStartRec_ = null;
+
+/** @private {string} */
+shaka.test.IdbTracer.session_ = '';
 
 /** @private {?number} */
 shaka.test.IdbTracer.watchdog_ = null;
