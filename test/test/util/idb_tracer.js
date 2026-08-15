@@ -63,8 +63,13 @@ shaka.test.IdbTracer = class {
       wedgeMs: 15000,
       // Cap on retained records, so a long run cannot exhaust memory.
       maxRecords: 50000,
-      // Records per console line when dumping.
-      chunkSize: 50,
+      // Records per console line when dumping.  Kept small because the log
+      // pipeline truncates very long lines, and a truncated chunk loses every
+      // record in it.
+      chunkSize: 25,
+      // End the run as soon as the database wedges, instead of letting every
+      // remaining spec time out against a database that will never recover.
+      abortOnWedge: true,
     };
     for (const key in config || {}) {
       T.config_[key] = config[key];
@@ -153,8 +158,32 @@ shaka.test.IdbTracer = class {
                       ' (seq ' + rec.seq + ') outstanding for ' +
                       Math.round(age) + 'ms');
         T.dump('wedge: ' + rec.op + ' seq=' + rec.seq);
+        T.abortRun_();
         return;
       }
+    }
+  }
+
+  /**
+   * End the run once the database has wedged.
+   *
+   * The database never recovers, so every remaining spec would burn its whole
+   * timeout twice, once in beforeEach and once in the body.  Across a suite
+   * that runs for hours and tells us nothing new: the trace is already dumped,
+   * and for measuring how often this happens, one hit per run is enough.
+   * Ending here keeps a wedged run about as cheap as a healthy one, which is
+   * what makes it practical to run many of them.
+   *
+   * @private
+   */
+  static abortRun_() {
+    const T = shaka.test.IdbTracer;
+    if (!T.config_.abortOnWedge) {
+      return;
+    }
+    if (window['__karma__'] && window['__karma__']['error']) {
+      window['__karma__']['error'](
+          '[idb-trace] IndexedDB wedged; ending run early.');
     }
   }
 

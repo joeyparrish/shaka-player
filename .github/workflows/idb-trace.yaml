@@ -21,10 +21,13 @@ on:
         description: "Test filter.  'offline' expands to all storage tests."
         required: false
         default: "offline"
-      attempts:
-        description: "Times to repeat the run in each job, to catch a rare hang."
+      runs:
+        description: >
+          Times to repeat the suite in each job.  The hang is rare, so
+          measuring its rate, or showing that a fix removed it, needs many
+          samples.
         required: false
-        default: "1"
+        default: "5"
       test_timeout:
         description: >
           Per-test timeout [ms].  Lower than the 120s default on purpose: once
@@ -123,19 +126,22 @@ jobs:
         timeout-minutes: 60
         continue-on-error: true
         shell: bash
+        # Use test.py --runs rather than looping here.  Actions runs each step
+        # under "bash -e", so a shell loop aborts on the first run that fails,
+        # which is exactly the run that found a hang -- it would stop sampling
+        # at the moment the thing we are counting occurs.  test.py loops
+        # internally and records every run's result.
         run: |
-          for i in $(seq 1 ${{ inputs.attempts || 1 }}); do
-            echo "=== Attempt $i ==="
-            python3 build/test.py \
-              --no-build \
-              --browsers "${{ matrix.browser }}" \
-              --filter "${{ inputs.filter || 'offline' }}" \
-              --idb-trace \
-              --test-timeout "${{ inputs.test_timeout || 30000 }}" \
-              --reporters spec \
-              ${{ matrix.extra_flags }} \
-              2>&1 | tee -a idb-trace.log
-          done
+          python3 build/test.py \
+            --no-build \
+            --browsers "${{ matrix.browser }}" \
+            --filter "${{ inputs.filter || 'offline' }}" \
+            --idb-trace \
+            --runs "${{ inputs.runs || 5 }}" \
+            --test-timeout "${{ inputs.test_timeout || 30000 }}" \
+            --reporters spec \
+            ${{ matrix.extra_flags }} \
+            2>&1 | tee idb-trace.log
 
       # The console view truncates long lines and long logs, and the trace is
       # both.  Keep the raw log as an artifact.
@@ -148,13 +154,24 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      # Print the sample size and hit count, so the wedge rate can be read off
+      # the job without downloading and parsing the trace.
       - name: Report wedge status
         if: always()
         shell: bash
         run: |
-          if grep -q "WEDGE DETECTED" idb-trace.log; then
-            echo "::warning::IndexedDB wedge reproduced on ${{ matrix.os }} ${{ matrix.browser }}"
+          sessions=$(grep -c "idb-trace] Installed" idb-trace.log || true)
+          wedges=$(grep -c "WEDGE DETECTED" idb-trace.log || true)
+          echo "runs_started=$sessions"
+          echo "runs_wedged=$wedges"
+          {
+            echo "### ${{ matrix.os }} ${{ matrix.browser }}"
+            echo ""
+            echo "| runs started | runs wedged |"
+            echo "| --- | --- |"
+            echo "| $sessions | $wedges |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$wedges" -gt 0 ]; then
+            echo "::warning::IndexedDB wedged in $wedges of $sessions runs on ${{ matrix.os }} ${{ matrix.browser }}"
             grep -m5 "WEDGE DETECTED" idb-trace.log
-          else
-            echo "No wedge detected in this run."
           fi
