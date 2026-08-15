@@ -269,7 +269,18 @@ shaka.test.IdbTracer = class {
       return request;
     }
     rec.req = T.id_(request, 'req');
-    request.addEventListener('success', () => T.finish_(rec, 'success'));
+    request.addEventListener('success', () => {
+      T.finish_(rec, 'success');
+      // An open() hands back a connection, whose own lifecycle events tell us
+      // whether it ever got in the way of a later upgrade or delete.  Record
+      // its id too: without it there is no way to pair an open against the
+      // close that should have followed, and an unclosed connection is exactly
+      // what blocks a delete.
+      if (rec.op === 'open' && request.result) {
+        rec.db = T.id_(request.result, 'db');
+        T.trackDatabase_(request.result);
+      }
+    });
     request.addEventListener('error', () => {
       T.finish_(rec, 'error', request.error);
     });
@@ -290,6 +301,48 @@ shaka.test.IdbTracer = class {
     });
     request.addEventListener('blocked', () => T.mark_(rec, 'blocked'));
     return request;
+  }
+
+  /**
+   * Watch an open database connection for the events that surround a blocked
+   * upgrade or delete.
+   *
+   * A "versionchange" event asks this connection to close so that another one
+   * can upgrade or delete the database.  A connection that does not close in
+   * response leaves the other request blocked indefinitely, which is one of the
+   * ways IndexedDB stops responding.  Pairing these against the db.close calls
+   * already in the trace shows whether the request was honored.
+   *
+   * @param {*} db
+   * @private
+   */
+  static trackDatabase_(db) {
+    const T = shaka.test.IdbTracer;
+    if (!db || !db.addEventListener || T.trackedDbs_.has(db)) {
+      return;
+    }
+    T.trackedDbs_.add(db);
+    const dbId = T.id_(db, 'db');
+
+    db.addEventListener('versionchange', (event) => {
+      T.record_('db.versionchange', {
+        db: dbId,
+        dbName: db.name,
+        oldVersion: event.oldVersion,
+        newVersion: event.newVersion,
+      }, false);
+    });
+    // Fired when the browser closes the connection out from under us, for
+    // instance after the database is deleted or on an unrecoverable error.
+    db.addEventListener('close', () => {
+      T.record_('db.forceClose', {db: dbId, dbName: db.name}, false);
+    });
+    db.addEventListener('abort', () => {
+      T.record_('db.abort', {db: dbId, dbName: db.name}, false);
+    });
+    db.addEventListener('error', () => {
+      T.record_('db.error', {db: dbId, dbName: db.name}, false);
+    });
   }
 
   /**
@@ -370,6 +423,12 @@ shaka.test.IdbTracer = class {
         result.then(
             () => T.finish_(rec, 'success'),
             (e) => T.finish_(rec, 'error', e));
+      } else {
+        // A synchronous call is already finished, but record the end time
+        // anyway.  IDBDatabase.close() in particular is specified to return
+        // immediately and defer the actual close, so if it ever does block,
+        // the duration is exactly what we would want to see.
+        T.finish_(rec, 'sync');
       }
       return result;
     };
@@ -609,6 +668,18 @@ shaka.test.IdbTracer = class {
 
     T.wrap_(proto, 'clear', 'clear', (self) => base(self), 'request');
 
+    // Index schema changes, which only happen inside a versionchange
+    // transaction.
+    T.wrap_(proto, 'createIndex', 'createIndex', (self, args) => ({
+      store: self.name,
+      index: args[0],
+      keyPath: String(args[1]),
+    }), 'sync');
+    T.wrap_(proto, 'deleteIndex', 'deleteIndex', (self, args) => ({
+      store: self.name,
+      index: args[0],
+    }), 'sync');
+
     for (const name of ['openCursor', 'openKeyCursor']) {
       T.wrap_(proto, name, name, (self, args) => {
         const fields = base(self);
@@ -753,6 +824,9 @@ shaka.test.IdbTracer.pending_ = new Map();
 
 /** @private {!WeakMap<!Object, string>} */
 shaka.test.IdbTracer.ids_ = new WeakMap();
+
+/** @private {!WeakSet<!Object>} */
+shaka.test.IdbTracer.trackedDbs_ = new WeakSet();
 
 /** @private {!Object<string, number>} */
 shaka.test.IdbTracer.counters_ = {};
