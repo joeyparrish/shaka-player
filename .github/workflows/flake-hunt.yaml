@@ -1,0 +1,233 @@
+name: Flake Hunt
+
+# A manual harness for chasing a specific flaky test.
+#
+# Point it at one browser and one filter, ask for many runs, and it reports how
+# many of those runs failed and which specs failed in them.  That answers the
+# first question any flake investigation needs: how often does this actually
+# happen?  Without a rate, there is no way to tell later whether a fix worked
+# or whether the flake simply did not show up.
+#
+# Manual trigger only.  Nothing here runs on push, PR, or a schedule, so it
+# cannot affect normal CI signal.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "The ref to build and test."
+        required: false
+      os:
+        description: "Runner to test on."
+        required: false
+        default: "macos-latest"
+        type: choice
+        options:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+      browser:
+        description: "Browser to test."
+        required: false
+        default: "Safari"
+      filter:
+        description: >
+          Regular expression limiting which specs run.  Narrow it to a single
+          spec first; if the flake needs neighbours to reproduce, widen it to
+          the suite, then to everything.
+        required: false
+        default: ""
+      runs:
+        description: "Times to repeat the suite.  A rate needs many samples."
+        required: false
+        default: "20"
+      test_timeout:
+        description: >
+          Per-test timeout [ms].  Lower than the 120s default keeps a hung run
+          from dragging out, but must stay above the slowest healthy spec in
+          the filter or it will manufacture failures of its own.
+        required: false
+        default: "60000"
+      control:
+        description: "Also run Linux Chrome, as a healthy comparison."
+        required: false
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+      extra_flags:
+        description: >
+          Extra flags for test.py, such as --enable-logging when a test reports
+          through the console.  Console output is dropped without it.
+        required: false
+        default: ""
+
+jobs:
+  build:
+    name: Build Player
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - name: Build Player
+        timeout-minutes: 20
+        run: python3 build/all.py --only-es5
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: player-build
+          path: dist/
+
+  hunt:
+    needs: build
+    name: ${{ inputs.os }} ${{ inputs.browser }}
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      # Browser setup has to match the main test workflow.  A hunt that runs a
+      # browser configured differently measures a different thing, and the
+      # difference shows up as tests failing here that pass there.
+      #
+      # Firefox on Ubuntu is missing codecs the tests assume, unless ffmpeg is
+      # installed.
+      # The installs get a longer timeout than the main workflow allows.  Losing
+      # a whole sampling run because a package mirror was slow wastes far more
+      # time than waiting out a slow install, and this is setup rather than
+      # anything being measured.
+      - name: Install FFmpeg
+        timeout-minutes: 15
+        if: inputs.os == 'ubuntu-latest' && inputs.browser == 'Firefox'
+        run: sudo apt -y update && sudo apt -y install ffmpeg
+
+      - name: 'Install Opera on Ubuntu'
+        timeout-minutes: 15
+        if: inputs.os == 'ubuntu-latest' && inputs.browser == 'Opera'
+        run: sudo apt -y update && sudo apt -y install snapd && sudo snap install opera
+
+      # "Chrome for Testing" shadows real Chrome and lacks basic codecs.
+      - name: 'Delete "Chrome for Testing" on Mac'
+        if: inputs.os == 'macos-latest' && inputs.browser == 'Chrome'
+        run: sudo rm -rf /Applications/Google\ Chrome\ for\ Testing.app
+      - name: 'Install Edge on Mac'
+        if: inputs.os == 'macos-latest' && inputs.browser == 'Edge'
+        run: brew install --cask microsoft-edge
+      - name: 'Install Opera on Mac'
+        if: inputs.os == 'macos-latest' && inputs.browser == 'Opera'
+        run: brew install --cask opera
+      - name: 'Install Firefox on Mac'
+        if: inputs.os == 'macos-latest' && inputs.browser == 'Firefox'
+        run: brew install --cask firefox
+
+      # Same reason as on Mac: the preinstalled "Chrome for Testing" shadows
+      # real Chrome, and it lacks the codecs and the content decryption module
+      # that the real browser ships with.
+      - name: 'Overwrite "Chrome for Testing" on Windows'
+        if: inputs.os == 'windows-latest' && inputs.browser == 'Chrome'
+        shell: bash
+        run: choco install -y googlechrome --ignore-checksums
+
+      - name: 'Install Opera on Windows'
+        timeout-minutes: 5
+        if: inputs.os == 'windows-latest' && inputs.browser == 'Opera'
+        run: choco install -y opera --ignore-checksums --params '"/NoAutostart /NoDesktopShortcut /NoTaskbarShortcut"'
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: player-build
+          path: dist/
+
+      # continue-on-error, because a failing run is the point.  Without it the
+      # step would stop the job before the results are summarized.
+      - name: Hunt
+        timeout-minutes: 120
+        continue-on-error: true
+        shell: bash
+        run: |
+          python3 build/test.py \
+            --no-build \
+            --browsers "${{ inputs.browser }}" \
+            --filter "${{ inputs.filter }}" \
+            --runs "${{ inputs.runs }}" \
+            --test-timeout "${{ inputs.test_timeout }}" \
+            --reporters spec --spec-hide-passed \
+            --running_in_vm \
+            ${{ inputs.extra_flags }} \
+            ${{ inputs.os == 'ubuntu-latest' && '--use-xvfb' || '' }} \
+            2>&1 | tee hunt.log
+
+      - name: Upload log
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: hunt-${{ inputs.browser }}-${{ inputs.os }}
+          path: hunt.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Summarize
+        if: always()
+        shell: bash
+        run: |
+          bash build/summarize_flake_hunt.sh hunt.log \
+              "${{ inputs.os }} ${{ inputs.browser }}"
+
+  control:
+    needs: build
+    if: inputs.control == 'true' && inputs.os != 'ubuntu-latest'
+    name: control (ubuntu-latest Chrome)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          persist-credentials: false
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: player-build
+          path: dist/
+
+      - name: Hunt
+        timeout-minutes: 120
+        continue-on-error: true
+        shell: bash
+        run: |
+          python3 build/test.py \
+            --no-build \
+            --browsers Chrome \
+            --filter "${{ inputs.filter }}" \
+            --runs "${{ inputs.runs }}" \
+            --test-timeout "${{ inputs.test_timeout }}" \
+            --reporters spec --spec-hide-passed \
+            --running_in_vm --use-xvfb \
+            2>&1 | tee hunt.log
+
+      - name: Upload log
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: hunt-control-Chrome-ubuntu-latest
+          path: hunt.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Summarize
+        if: always()
+        shell: bash
+        run: bash build/summarize_flake_hunt.sh hunt.log "control Linux Chrome"
