@@ -277,50 +277,89 @@ describe('HlsParser', () => {
     await player.unload();
   });
 
-  it('plays all combinations of video and audio renditions', async () => {
-    // This asset has two EXT-X-STREAM-INF tags with both AUDIO and VIDEO
-    // attributes: 2 resolutions x 3 video renditions (RED has no URI, so it
-    // is the variant's own stream) x 3 audio renditions = 18 variants.
-    player.configure('abr.enabled', false);
-    await player.load('/base/test/test/assets/hls-multivideo/master.m3u8');
-    expect(player.isLive()).toBe(false);
+  // Quarantined.  Fails on Safari roughly half the time, and only at the two
+  // switches that replace the audio rendition, never at the fifteen that change
+  // video alone.  The media element ends up stuck with seeking true for good:
+  // currentTime updates, readyState reaches 3 or 4, audio holds 0 to 4.040 and
+  // video 0.067 to 4.067, there is no error, and it is unpaused at rate 1, but
+  // a pending seek never completes so playback never advances.  Nothing
+  // recovers it, including play(), nudging the playhead, seeking well inside
+  // the buffer, restoring the rate, and turning off the player's rate control.
+  //
+  // Already ruled out: the content, whose renditions all start at the same
+  // timestamps; gap jumping and the playhead's position; the seek target, since
+  // seeking to 0 and to 0.498 fail alike; and the player forcing the rate to
+  // zero.  Picking it up again means tracing the MediaSource and media element
+  // calls and diffing a passing switch against a failing one.
+  quarantinedIt('plays all combinations of video and audio renditions',
+      async () => {
+        // This asset has two EXT-X-STREAM-INF tags with both AUDIO and VIDEO
+        // attributes: 2 resolutions x 3 video renditions (RED has no URI, so it
+        // is the variant's own stream) x 3 audio renditions = 18 variants.
+        player.configure('abr.enabled', false);
+        await player.load('/base/test/test/assets/hls-multivideo/master.m3u8');
+        expect(player.isLive()).toBe(false);
 
-    const variants = player.getVariantTracks();
-    expect(variants.length).toBe(18);
+        const variants = player.getVariantTracks();
+        expect(variants.length).toBe(18);
 
-    // Every combination must be present exactly once.
-    const combinations = variants.map((variant) => {
-      return variant.height + '-' + variant.videoLabel + '-' + variant.label;
-    });
-    expect(combinations.length).toBe(new Set(combinations).size);
-    for (const height of [720, 360]) {
-      for (const videoLabel of ['RED', 'GREEN', 'BLUE']) {
-        for (const audioLabel of
-          ['Original 128k', 'High Pitch 128k', 'Low Pitch 128k']) {
-          expect(combinations)
-              .toContain(height + '-' + videoLabel + '-' + audioLabel);
+        // Every combination must be present exactly once.
+        const combinations = variants.map((variant) => {
+          return variant.height + '-' + variant.videoLabel + '-' +
+              variant.label;
+        });
+        expect(combinations.length).toBe(new Set(combinations).size);
+        for (const height of [720, 360]) {
+          for (const videoLabel of ['RED', 'GREEN', 'BLUE']) {
+            for (const audioLabel of
+              ['Original 128k', 'High Pitch 128k', 'Low Pitch 128k']) {
+              expect(combinations)
+                  .toContain(height + '-' + videoLabel + '-' + audioLabel);
+            }
+          }
         }
-      }
-    }
 
-    await video.play();
+        /**
+         * Say which combination we were on when playback failed to start.
+         * Every wait below reports the same "movement from 0 to 1", so without
+         * this there is no way to tell the initial playback apart from any of
+         * eighteen switches that follow.
+         *
+         * @param {string} what
+         * @return {!Promise}
+         */
+        const waitForMovement = async (what) => {
+          try {
+            await waiter.waitForMovementOrFailOnTimeout(video, 10);
+            // eslint-disable-next-line no-restricted-syntax
+          } catch (error) {
+            error.message = what + ': ' + error.message;
+            throw error;
+          }
+        };
 
-    // Wait for the video to start playback.  If it takes longer than 10
-    // seconds, fail the test.
-    await waiter.waitForMovementOrFailOnTimeout(video, 10);
+        await video.play();
 
-    // Play every combination from the beginning.
-    for (const variant of variants) {
-      player.selectVariantTrack(variant, /* clearBuffer= */ true);
-      video.currentTime = 0;
-      // eslint-disable-next-line no-await-in-loop
-      await waiter.waitForMovementOrFailOnTimeout(video, 10);
-      const active = player.getVariantTracks().find((t) => t.active);
-      expect(active.id).toBe(variant.id);
-    }
+        // Wait for the video to start playback.  If it takes longer than 10
+        // seconds, fail the test.
+        await waitForMovement('initial playback');
 
-    await player.unload();
-  });
+        // Play every combination from the beginning.
+        for (let i = 0; i < variants.length; i++) {
+          const variant = variants[i];
+          const name = 'variant ' + i + ' of ' + variants.length + ' (' +
+          variant.height + 'p ' + variant.videoLabel + ' / ' +
+          variant.label + ')';
+          player.selectVariantTrack(variant, /* clearBuffer= */ true);
+          video.currentTime = 0;
+          // eslint-disable-next-line no-await-in-loop
+          await waitForMovement(name);
+          const active = player.getVariantTracks().find((t) => t.active);
+          expect(active.id).toBe(variant.id);
+        }
+
+        await player.unload();
+      });
 
   it('plays muxed TS audio in video', async () => {
     // This asset has muxed audio in the video stream (no separate audio URI
