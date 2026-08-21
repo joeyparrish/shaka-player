@@ -276,6 +276,15 @@ class Launcher:
         action='store_true',
         default=False)
     running_commands.add_argument(
+        '--mse-trace',
+        help='Log every MediaSource and media element call and event, and '
+             'dump a trace to the console at the end of each test.  Used to '
+             'compare a run where playback starts against one where it '
+             'stalls.',
+        dest='mse_trace',
+        action='store_true',
+        default=False)
+    running_commands.add_argument(
         '--test-timeout',
         help='Sets the test timeout value [ms] (default %(default)s)',
         dest='test_timeout',
@@ -405,6 +414,7 @@ class Launcher:
       'idb_trace',
       'log_level',
       'logging',
+      'mse_trace',
       'no_browsers',
       'port',
       'quarantined',

@@ -661,6 +661,13 @@ async function setupTestEnvironment() {
     shaka.test.IdbTracer.install();
   }
 
+  // Likewise install this before any media element or MediaSource exists, so
+  // that the trace covers the calls that set playback up as well as the ones
+  // that follow.
+  if (getClientArg('mseTrace')) {
+    shaka.test.MseTracer.install();
+  }
+
   const logLevel = getClientArg('logLevel');
   if (logLevel) {
     shaka.log.setLevel(Number(logLevel));

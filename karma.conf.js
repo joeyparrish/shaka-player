@@ -364,9 +364,9 @@ module.exports = (config) => {
       useIframe: false,  // No iframe
       runInParent: true,  // No new window
       // Only capture the client's logs if the settings want logging.  The
-      // IndexedDB tracer reports through the console, so it needs this on.
+      // tracers report through the console, so they need this on.
       captureConsole: (!!settings.logging && settings.logging != 'none') ||
-          !!settings.idb_trace,
+          !!settings.idb_trace || !!settings.mse_trace,
       // |args| must be an array; pass a key-value map as the sole client
       // argument.
       args: [{
@@ -404,6 +404,9 @@ module.exports = (config) => {
 
         // Trace IndexedDB operations to diagnose the macOS-only hang.
         idbTrace: !!settings.idb_trace,
+
+        // Trace MediaSource and media element calls to diagnose a stall.
+        mseTrace: !!settings.mse_trace,
 
         // True if the test.py --grid_config option was used.
         runningInLab: !!settings.grid_config,
