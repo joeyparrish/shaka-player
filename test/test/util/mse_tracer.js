@@ -128,6 +128,44 @@ shaka.test.MseTracer = class {
   }
 
   /**
+   * Name the code that is writing currentTime.
+   *
+   * Knowing that the playhead moved is not enough to act on: several parts of
+   * the player seek, and a workaround aimed at the wrong one is worse than
+   * none, having looked like it was tested.  Only the frames inside the player
+   * are worth keeping, so drop this file's own frames and anything below the
+   * shim.
+   *
+   * @return {?string}
+   * @private
+   */
+  static caller_() {
+    const stack = new Error().stack;
+    if (!stack) {
+      return null;
+    }
+    const frames = [];
+    for (const line of stack.split('\n')) {
+      if (line.indexOf('mse_tracer') >= 0 || line.indexOf('Error') === 0) {
+        continue;
+      }
+      const match = line.match(/([\w$.]+\.js):(\d+)/);
+      if (match) {
+        frames.push(match[1] + ':' + match[2]);
+      } else {
+        const name = line.trim().split(/\s+/)[0];
+        if (name) {
+          frames.push(name);
+        }
+      }
+      if (frames.length >= 4) {
+        break;
+      }
+    }
+    return frames.join(' < ');
+  }
+
+  /**
    * @return {boolean} True if anything media-related was recorded for the
    *   current spec.
    * @private
@@ -524,6 +562,7 @@ shaka.test.MseTracer = class {
           Object.assign(fields, T.elementState_(
               /** @type {!HTMLMediaElement} */(video)));
           fields['value'] = T.time_(/** @type {number} */(value));
+          fields['from'] = T.caller_();
           T.watchElement_(/** @type {!HTMLMediaElement} */(video));
         });
     T.wrapSetter_(proto, 'playbackRate', 'video.playbackRate',

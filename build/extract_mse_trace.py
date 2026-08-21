@@ -117,7 +117,7 @@ def describe(record):
     A string describing the record.
   """
   parts = [record.get('op', '?')]
-  for key in ('sb', 'el', 'value', 'start', 'end', 'bytes', 'type',
+  for key in ('sb', 'el', 'value', 'from', 'start', 'end', 'bytes', 'type',
               'currentTime', 'readyState', 'seeking', 'paused', 'updating',
               'buffered', 'threw'):
     if key in record:
