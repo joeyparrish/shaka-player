@@ -36,8 +36,11 @@ describe('HlsParser', () => {
 
     // Disable stall detection, which can interfere with playback tests.
     player.configure('streaming.stallEnabled', false);
-    // Disable gapPadding, which can interfere with playback tests.
-    player.configure('streaming.gapPadding', 0);
+    // EXPERIMENT, NOT FOR UPSTREAM.  This normally sets gapPadding to 0, which
+    // also disables the padding the device would have chosen, and so silently
+    // neutralized the previous attempt to measure it.  Left at the device
+    // default to find out whether padding the jump keeps the rendition switch
+    // from stranding on Safari.
 
     // Grab event manager from the uncompiled library:
     eventManager = new shaka.util.EventManager();
