@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<!--
+ Copyright 2016 Google LLC
+ SPDX-License-Identifier: Apache-2.0
+
+ Standalone reproduction for a WebKit bug: a seek issued while an earlier seek
+ is still pending never completes, even though the target is buffered.
+
+ No player library is involved.  Serve the repository root over HTTP and open
+ this page, for example:
+
+   python3 -m http.server 8080
+   open http://localhost:8080/build/webkit_seek_repro.html
+
+ The media is two fragmented MP4 files from the Shaka Player test assets.  The
+ video is appended with a small timestampOffset so that its buffered range
+ starts slightly after zero, which is what the original content did and what
+ makes the first seek land in a gap.
+-->
+<meta charset="utf-8">
+<title>WebKit pending-seek reproduction</title>
+<style>
+  body { font: 14px/1.5 -apple-system, sans-serif; margin: 2em; max-width: 46em; }
+  #log { white-space: pre-wrap; font-family: monospace; font-size: 12px; }
+  .stall { color: #b00; font-weight: bold; }
+  .ok { color: #060; }
+  button { font-size: 14px; padding: 0.4em 1em; }
+</style>
+
+<h1>WebKit pending-seek reproduction</h1>
+
+<p>
+  Each trial clears both source buffers, re-appends them, seeks to a time that
+  is not yet buffered, and then, while that seek is still pending, seeks again
+  to a time that <em>is</em> buffered.  The second seek should complete.  A
+  trial is counted as stalled if no <code>seeked</code> event arrives within
+  five seconds while <code>video.seeking</code> is still true.
+</p>
+
+<p>
+  Each ingredient below is something the player does that a first, simpler
+  version of this page left out, and that version did not reproduce.  Start
+  with all of them on.  If that stalls, turn them off one at a time to find
+  which ones are actually required.
+</p>
+
+<ul style="list-style:none; padding-left:0">
+  <li><label><input type="checkbox" id="overlap" checked>
+    <b>overlap</b>: issue the second seek while the first is still pending
+    (off waits for the first to settle)</label></li>
+  <li><label><input type="checkbox" id="nudge" checked>
+    <b>nudge</b>: two writes of <code>currentTime = -0.001</code> while the
+    buffers are empty and a seek is pending, as the player does to flush the
+    pipeline on WebKit</label></li>
+  <li><label><input type="checkbox" id="reset" checked>
+    <b>reset</b>: <code>abort()</code>, then rewrite
+    <code>appendWindowStart</code>, <code>appendWindowEnd</code> and
+    <code>timestampOffset</code> before appending</label></li>
+  <li><label><input type="checkbox" id="altAudio" checked>
+    <b>altAudio</b>: alternate between two audio renditions, so each switch
+    installs a different initialization segment and the decoder has to
+    reconfigure (off reinstalls the same one every time)</label></li>
+  <li><label><input type="checkbox" id="eos" checked>
+    <b>eos</b>: call <code>endOfStream()</code> immediately after the second
+    seek</label></li>
+  <li><label><input type="checkbox" id="persist" checked>
+    <b>persist</b>: run every switch against one long-lived
+    <code>MediaSource</code>, letting playback advance in between, the way the
+    failing test does (off gives each switch a fresh element, which throws away
+    whatever state accumulates)</label></li>
+</ul>
+
+<p>
+  <button id="run">Run 20 trials</button>
+  <span id="status"></span>
+</p>
+
+<video id="video" muted playsinline width="320"></video>
+<div id="log"></div>
+
+<script>
+const VIDEO_URL = '../test/test/assets/dash-multi-codec/video_144p_108k_h264.mp4';
+const VIDEO_TYPE = 'video/mp4; codecs="avc1.4d400c"';
+const AUDIO_TYPE = 'audio/mp4; codecs="mp4a.40.2"';
+
+// Two audio renditions.  They are the same codec, so one SourceBuffer takes
+// both, but they are different encodes with different initialization segments,
+// so switching between them makes the decoder reconfigure.  That is the part
+// the earlier version of this page could not exercise, and the failing test
+// only ever stalls on switches that replace the audio rendition.
+const AUDIO_RENDITIONS = [
+  {
+    name: 'dash 128k',
+    url: '../test/test/assets/dash-multi-codec/audio_en_2c_128k_aac.mp4',
+  },
+  {
+    name: 'sintel',
+    initUrl: '../test/test/assets/sintel-audio-init.mp4',
+    mediaUrl: '../test/test/assets/sintel-audio-segment.mp4',
+  },
+];
+
+// Push the video slightly later than the audio, so that a seek to 0 has no
+// video to land on.  This mirrors the content that first showed the bug, where
+// video began at 0.067 and audio at 0.
+const VIDEO_OFFSET = 0.067;
+
+// How long to wait for the second seek before calling the trial stalled.  A
+// healthy seek here completes in a few milliseconds.
+const SEEK_TIMEOUT_MS = 5000;
+
+const video = document.getElementById('video');
+const logEl = document.getElementById('log');
+const statusEl = document.getElementById('status');
+
+let videoInit = null;
+let videoMedia = null;
+let videoStart = 0;
+
+/**
+ * Split a fragmented MP4 into its initialization segment and the rest, by
+ * finding the first 'moof' box.  The player appends those separately, and this
+ * page needs to be able to do the same.
+ */
+function splitInit(data) {
+  const bytes = new Uint8Array(data);
+  for (let i = 0; i + 4 < bytes.length; i++) {
+    if (bytes[i] === 0x6d && bytes[i + 1] === 0x6f &&
+        bytes[i + 2] === 0x6f && bytes[i + 3] === 0x66) {
+      // The fourcc sits four bytes into the box, after its size.
+      const start = i - 4;
+      return [data.slice(0, start), data.slice(start)];
+    }
+  }
+  return [data, new ArrayBuffer(0)];
+}
+
+function log(text, cls) {
+  const line = document.createElement('div');
+  if (cls) {
+    line.className = cls;
+  }
+  line.textContent = text;
+  logEl.appendChild(line);
+}
+
+function ranges(tr) {
+  const out = [];
+  for (let i = 0; i < tr.length; i++) {
+    out.push('[' + tr.start(i).toFixed(3) + ', ' + tr.end(i).toFixed(3) + ']');
+  }
+  return out.join(' ') || '(none)';
+}
+
+function once(target, type) {
+  return new Promise((resolve) => {
+    target.addEventListener(type, resolve, {once: true});
+  });
+}
+
+function updateDone(buffer) {
+  return buffer.updating ? once(buffer, 'updateend') : Promise.resolve();
+}
+
+const fetchBuffer = (url) => fetch(url).then((r) => r.arrayBuffer());
+
+/**
+ * Find where a rendition's media actually begins, by appending it on its own
+ * and reading the buffered range back.  These assets come from different
+ * sources and do not share a timeline, so nothing here can assume they start
+ * at zero, and one whose media landed outside the other's range would make the
+ * element's buffered union empty and the trial meaningless.
+ */
+async function measureStart(type, init, media) {
+  const probe = document.createElement('video');
+  const mediaSource = new MediaSource();
+  probe.src = URL.createObjectURL(mediaSource);
+  await once(mediaSource, 'sourceopen');
+  const buffer = mediaSource.addSourceBuffer(type);
+  buffer.appendBuffer(init);
+  await once(buffer, 'updateend');
+  buffer.appendBuffer(media);
+  await once(buffer, 'updateend');
+  const start = buffer.buffered.length ? buffer.buffered.start(0) : 0;
+  URL.revokeObjectURL(probe.src);
+  probe.src = '';
+  return start;
+}
+
+async function fetchOnce() {
+  if (videoInit) {
+    return;
+  }
+  statusEl.textContent = ' fetching media...';
+
+  const v = await fetchBuffer(VIDEO_URL);
+  [videoInit, videoMedia] = splitInit(v);
+
+  for (const rendition of AUDIO_RENDITIONS) {
+    if (rendition.url) {
+      const data = await fetchBuffer(rendition.url);
+      [rendition.init, rendition.media] = splitInit(data);
+    } else {
+      rendition.init = await fetchBuffer(rendition.initUrl);
+      rendition.media = await fetchBuffer(rendition.mediaUrl);
+    }
+  }
+
+  statusEl.textContent = ' measuring timelines...';
+  videoStart = await measureStart(VIDEO_TYPE, videoInit, videoMedia);
+  log('video: init ' + videoInit.byteLength + ' + media ' +
+      videoMedia.byteLength + ' bytes, starts at ' + videoStart.toFixed(3));
+  for (const rendition of AUDIO_RENDITIONS) {
+    rendition.start =
+        await measureStart(AUDIO_TYPE, rendition.init, rendition.media);
+    log('audio "' + rendition.name + '": init ' + rendition.init.byteLength +
+        ' + media ' + rendition.media.byteLength + ' bytes, starts at ' +
+        rendition.start.toFixed(3));
+  }
+  statusEl.textContent = '';
+}
+
+/**
+ * Append one rendition, shifting it so its media lands where we want it.
+ */
+async function append(buffer, init, media, offset) {
+  buffer.timestampOffset = offset;
+  buffer.appendBuffer(init);
+  await once(buffer, 'updateend');
+  buffer.appendBuffer(media);
+  await once(buffer, 'updateend');
+}
+
+async function setup(audio) {
+  const mediaSource = new MediaSource();
+  video.src = URL.createObjectURL(mediaSource);
+  await once(mediaSource, 'sourceopen');
+
+  const videoBuffer = mediaSource.addSourceBuffer(VIDEO_TYPE);
+  const audioBuffer = mediaSource.addSourceBuffer(AUDIO_TYPE);
+
+  // Audio starts at zero and video slightly after it, so that a seek to zero
+  // has audio to land on but no video.  That is the shape the failing test
+  // showed: audio 0 to 4.040, video 0.067 to 4.067.
+  await append(videoBuffer, videoInit, videoMedia, VIDEO_OFFSET - videoStart);
+  await append(audioBuffer, audio.init, audio.media, -audio.start);
+
+  await video.play();
+  return {mediaSource, videoBuffer, audioBuffer};
+}
+
+/**
+ * Wait for the playhead to actually move, which is what the failing test does
+ * between switches.  Seeking again the instant a switch finishes would be a
+ * different exercise from the one that fails.
+ */
+async function advance(seconds = 0.4, timeoutMs = 4000) {
+  const from = video.currentTime;
+  const deadline = Date.now() + timeoutMs;
+  while (video.currentTime - from < seconds && Date.now() < deadline) {
+    await Promise.race([
+      once(video, 'timeupdate'),
+      new Promise((r) => setTimeout(r, 250)),
+    ]);
+  }
+  return video.currentTime - from;
+}
+
+/**
+ * One trial, following the order the player was observed to use.
+ */
+async function trial(state, opts, audio) {
+  const {mediaSource, videoBuffer, audioBuffer} = state;
+
+  // Clear both buffers, the way a rendition switch does, and seek to zero
+  // while those removals are still in flight.  This is the seek that cannot
+  // complete: by the time it is evaluated there is nothing buffered at all.
+  videoBuffer.remove(0, Infinity);
+  audioBuffer.remove(0, Infinity);
+  video.currentTime = 0;
+
+  await once(videoBuffer, 'updateend');
+  if (opts.nudge) {
+    video.currentTime = -0.001;
+  }
+  await once(audioBuffer, 'updateend');
+  if (opts.nudge) {
+    video.currentTime = -0.001;
+  }
+
+  if (opts.reset) {
+    for (const buffer of [videoBuffer, audioBuffer]) {
+      buffer.abort();
+      buffer.appendWindowStart = 0;
+      buffer.appendWindowEnd = Infinity;
+      buffer.timestampOffset = 0;
+    }
+  }
+
+  // Re-append both, the way a rendition switch does.  The audio init here may
+  // be a different rendition from the one already installed, which is what
+  // makes the decoder reconfigure.
+  await append(videoBuffer, videoInit, videoMedia, VIDEO_OFFSET - videoStart);
+  await append(audioBuffer, audio.init, audio.media, -audio.start);
+
+  if (!opts.overlap && video.seeking) {
+    // Control: let the first seek settle before issuing the second.
+    await Promise.race([
+      once(video, 'seeked'),
+      new Promise((r) => setTimeout(r, SEEK_TIMEOUT_MS)),
+    ]);
+  }
+
+  const wasSeeking = video.seeking;
+
+  // The second seek, to the start of what is now buffered.  This is the jump
+  // the player makes to get off a position that has no media.
+  const target = video.buffered.length ? video.buffered.start(0) : VIDEO_OFFSET;
+  video.currentTime = target;
+
+  if (opts.eos && mediaSource.readyState === 'open') {
+    mediaSource.endOfStream();
+  }
+
+  const settled = await Promise.race([
+    once(video, 'seeked').then(() => true),
+    new Promise((r) => setTimeout(() => r(false), SEEK_TIMEOUT_MS)),
+  ]);
+
+  return {
+    settled,
+    wasSeeking,
+    target,
+    buffered: ranges(video.buffered),
+    readyState: video.readyState,
+  };
+}
+
+async function run() {
+  logEl.textContent = '';
+  const opts = {};
+  for (const name of ['overlap', 'nudge', 'reset', 'altAudio', 'eos', 'persist']) {
+    opts[name] = document.getElementById(name).checked;
+  }
+  const on = Object.keys(opts).filter((k) => opts[k]).join(',') || 'none';
+  await fetchOnce();
+
+  let stalls = 0;
+  const trials = 20;
+  // One element for the whole run when persisting, so that state carries from
+  // one switch to the next the way it does in the failing test.
+  let shared = opts.persist ? await setup(AUDIO_RENDITIONS[0]) : null;
+
+  for (let i = 1; i <= trials; i++) {
+    statusEl.textContent = ' trial ' + i + ' of ' + trials + '...';
+    // Start on one rendition and switch to the other, so the trial's re-append
+    // installs a different audio initialization segment than the one playing.
+    const first = AUDIO_RENDITIONS[opts.altAudio ? i % 2 : 0];
+    const second = AUDIO_RENDITIONS[opts.altAudio ? (i + 1) % 2 : 0];
+
+    // Either carry the element across switches, or start clean each time.
+    const state = shared || await setup(first);
+    if (shared) {
+      // Let playback get going again before the next switch, as the test does
+      // by waiting for movement after each one.
+      await advance();
+    }
+    let result;
+    try {
+      result = await trial(state, opts, second);
+    } catch (error) {
+      log('trial ' + i + ': threw ' + error, 'stall');
+      continue;
+    }
+    const where = first.name + ' -> ' + second.name;
+    if (result.settled) {
+      log('trial ' + i + ': seeked to ' + result.target.toFixed(3) +
+          '  ' + where + '  buffered=' + result.buffered, 'ok');
+    } else {
+      stalls++;
+      log('trial ' + i + ': STALLED seeking to ' + result.target.toFixed(3) +
+          '  ' + where +
+          '  seeking=' + video.seeking +
+          '  readyState=' + result.readyState +
+          '  buffered=' + result.buffered +
+          '  (a seek was already pending: ' + result.wasSeeking + ')', 'stall');
+      if (shared) {
+        // The element is wedged, so every switch after this one would report
+        // the same stall.  Stop, the way the test does when it times out.
+        log('stopping: the shared element is stuck after ' + i + ' switches');
+        break;
+      }
+    }
+  }
+
+  statusEl.textContent = '';
+  log('');
+  log(stalls + ' of ' + trials + ' trials stalled  [' + on + ']');
+  document.title = 'DONE ' + stalls + '/' + trials;
+}
+
+document.getElementById('run').addEventListener('click', run);
+
+// ?auto=1 runs on load, and ?overlap=0 selects the control, so the page can be
+// driven from a script as well as by hand.
+const params = new URLSearchParams(location.search);
+for (const name of ['overlap', 'nudge', 'reset', 'altAudio', 'eos', 'persist']) {
+  if (params.get(name) === '0') {
+    document.getElementById(name).checked = false;
+  }
+}
+if (params.get('auto') === '1') {
+  addEventListener('load', run);
+}
+</script>
