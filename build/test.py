@@ -276,6 +276,15 @@ class Launcher:
         action='store_true',
         default=False)
     running_commands.add_argument(
+        '--no-speedup',
+        help='Play media at its natural rate.  Tests normally play at 3x to '
+             'keep the suite quick and to dodge a WebDriver slowdown on Mac, '
+             'which leaves a third as much wall time for anything playback '
+             'has to set up.',
+        dest='no_speedup',
+        action='store_true',
+        default=False)
+    running_commands.add_argument(
         '--mse-trace',
         help='Log every MediaSource and media element call and event, and '
              'dump a trace to the console at the end of each test.  Used to '
@@ -416,6 +425,7 @@ class Launcher:
       'logging',
       'mse_trace',
       'no_browsers',
+      'no_speedup',
       'port',
       'quarantined',
       'quick',

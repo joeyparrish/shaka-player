@@ -408,6 +408,9 @@ module.exports = (config) => {
         // Trace MediaSource and media element calls to diagnose a stall.
         mseTrace: !!settings.mse_trace,
 
+        // Play media at its natural rate instead of 3x.
+        noSpeedup: !!settings.no_speedup,
+
         // True if the test.py --grid_config option was used.
         runningInLab: !!settings.grid_config,
 
