@@ -139,10 +139,11 @@ describe('DashParser', () => {
             deviceDetected.getDeviceName() === 'Tizen') {
       pending('Disabled on Tizen.');
     }
-    const BrowserEngine = shaka.device.IDevice.BrowserEngine;
-    if (deviceDetected.getBrowserEngine() === BrowserEngine.WEBKIT) {
-      pending('Disabled on Safari.');
-    }
+    // EXPERIMENT, NOT FOR UPSTREAM.  Measuring whether the Safari ban is still
+    // needed.  It was added for random decoding errors, which is what the
+    // changeType splice turned out to cause on Opera, and Safari already
+    // reports that it cannot do changeType, so it should be taking the same
+    // cross-boundary path that fixed Opera.
     if (!await Util.isTypeSupported('video/webm; codecs="vp9"')) {
       pending('Codec VP9 is not supported by the platform.');
     }
