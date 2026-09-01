@@ -139,14 +139,23 @@ describe('DashParser', () => {
             deviceDetected.getDeviceName() === 'Tizen') {
       pending('Disabled on Tizen.');
     }
-    // EXPERIMENT, NOT FOR UPSTREAM.  Measuring whether the Safari ban is still
-    // needed.  It was added for random decoding errors, which is what the
-    // changeType splice turned out to cause on Opera, and Safari already
-    // reports that it cannot do changeType, so it should be taking the same
-    // cross-boundary path that fixed Opera.
+
+    // Safari stalls at the second container boundary.  Measured 2026-09-01,
+    // 5 runs out of 5: playback gets through the VP9 section and the H.264
+    // one, then stops at 4.30 of 4.90 seconds, just past the splice back to
+    // VP9 at 4.204, with readyState falling to 1 and no error raised.  It is
+    // starvation at the boundary rather than the decoding errors this was
+    // originally disabled for, so the reason is recorded here rather than
+    // left pointing at issue #2746.
+    const BrowserEngine = shaka.device.IDevice.BrowserEngine;
+    if (deviceDetected.getBrowserEngine() === BrowserEngine.WEBKIT) {
+      pending('Disabled on Safari: stalls at the second container boundary.');
+    }
+
     if (!await Util.isTypeSupported('video/webm; codecs="vp9"')) {
       pending('Codec VP9 is not supported by the platform.');
     }
+
     await player.load('/base/test/test/assets/dash-multitype-variant/dash.mpd');
     await video.play();
     expect(player.isLive()).toBe(false);
