@@ -53,6 +53,14 @@ on:
         default: "true"
         type: choice
         options: ["true", "false"]
+      timeout_minutes:
+        description: >
+          Minutes to allow the runs.  A full suite pass takes about ten
+          minutes, so twenty of them need upwards of three hours; the job is
+          failed rather than trimmed if this proves too short.  GitHub stops
+          any job at six hours regardless.
+        required: false
+        default: "350"
       extra_flags:
         description: >
           Extra flags for test.py, such as --enable-logging when a test reports
@@ -153,7 +161,7 @@ jobs:
       # continue-on-error, because a failing run is the point.  Without it the
       # step would stop the job before the results are summarized.
       - name: Hunt
-        timeout-minutes: 120
+        timeout-minutes: ${{ fromJSON(inputs.timeout_minutes) }}
         continue-on-error: true
         shell: bash
         run: |
@@ -183,7 +191,8 @@ jobs:
         shell: bash
         run: |
           bash build/summarize_flake_hunt.sh hunt.log \
-              "${{ inputs.os }} ${{ inputs.browser }}"
+              "${{ inputs.os }} ${{ inputs.browser }}" \
+              "${{ inputs.runs }}"
 
   control:
     needs: build
@@ -204,7 +213,7 @@ jobs:
           path: dist/
 
       - name: Hunt
-        timeout-minutes: 120
+        timeout-minutes: ${{ fromJSON(inputs.timeout_minutes) }}
         continue-on-error: true
         shell: bash
         run: |
@@ -230,4 +239,6 @@ jobs:
       - name: Summarize
         if: always()
         shell: bash
-        run: bash build/summarize_flake_hunt.sh hunt.log "control Linux Chrome"
+        run: |
+          bash build/summarize_flake_hunt.sh hunt.log "control Linux Chrome" \
+              "${{ inputs.runs }}"

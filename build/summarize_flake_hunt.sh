@@ -16,11 +16,17 @@
 
 # Summarize a flake hunt log: how many runs failed, and which specs failed.
 #
-# Usage: summarize_flake_hunt.sh <log-file> [label]
+# Given the number of runs that were asked for, this also fails when fewer than
+# that finished.  A hunt cut short reports a rate over a sample it did not
+# take, and looks exactly like a clean one, so it has to be an error rather
+# than a line in the output that is easy to read past.
+#
+# Usage: summarize_flake_hunt.sh <log-file> [label] [expected-runs]
 
 set -u
-LOG="${1:?usage: summarize_flake_hunt.sh <log-file> [label]}"
+LOG="${1:?usage: summarize_flake_hunt.sh <log-file> [label] [expected-runs]}"
 LABEL="${2:-flake hunt}"
+EXPECTED="${3:-0}"
 
 if [ ! -f "$LOG" ]; then
   echo "No log at $LOG"
@@ -36,6 +42,15 @@ failed=$(grep -ac "^.*TOTAL:.*FAILED" "$LOG" || true)
 echo "=== $LABEL"
 echo "runs_finished=$total"
 echo "runs_failed=$failed"
+
+TRUNCATED=""
+if [ "$EXPECTED" -gt 0 ] && [ "$total" -lt "$EXPECTED" ]; then
+  TRUNCATED="only $total of $EXPECTED runs finished"
+  echo "runs_expected=$EXPECTED"
+  echo "::error::Flake hunt truncated: $TRUNCATED.  Any rate from this log is"\
+       "measured over a sample that was never taken.  Raise timeout_minutes,"\
+       "or ask for fewer runs."
+fi
 
 # Strip color and the trailing "[Browser (OS)]" tag from each failing spec, so
 # the same spec failing in different runs groups together.  Karma writes a real
@@ -61,6 +76,10 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
   {
     echo "### $LABEL"
     echo ""
+    if [ -n "$TRUNCATED" ]; then
+      echo "**TRUNCATED: $TRUNCATED.**  These numbers are not a rate."
+      echo ""
+    fi
     echo "| runs finished | runs failed |"
     echo "| --- | --- |"
     echo "| $total | $failed |"
@@ -71,4 +90,11 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
       echo "$SPECS" | sed -E 's/^ *([0-9]+) (.*)$/| \1 | \2 |/'
     fi
   } >> "$GITHUB_STEP_SUMMARY"
+fi
+
+# Fail the job on a short sample.  The hunt step itself runs with
+# continue-on-error, since failing runs are what it is looking for, so this is
+# the only place a truncated hunt can be caught.
+if [ -n "$TRUNCATED" ]; then
+  exit 1
 fi
