@@ -276,6 +276,14 @@ class Launcher:
         action='store_true',
         default=False)
     running_commands.add_argument(
+        '--net-trace',
+        help='Log every network request and its outcome, and dump a trace to '
+             'the console if one stays outstanding.  Used to find a request '
+             'that never settles.',
+        dest='net_trace',
+        action='store_true',
+        default=False)
+    running_commands.add_argument(
         '--no-speedup',
         help='Play media at its natural rate.  Tests normally play at 3x to '
              'keep the suite quick and to dodge a WebDriver slowdown on Mac, '
@@ -424,6 +432,7 @@ class Launcher:
       'log_level',
       'logging',
       'mse_trace',
+      'net_trace',
       'no_browsers',
       'no_speedup',
       'port',

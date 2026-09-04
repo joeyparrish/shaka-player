@@ -366,7 +366,8 @@ module.exports = (config) => {
       // Only capture the client's logs if the settings want logging.  The
       // tracers report through the console, so they need this on.
       captureConsole: (!!settings.logging && settings.logging != 'none') ||
-          !!settings.idb_trace || !!settings.mse_trace,
+          !!settings.idb_trace || !!settings.mse_trace ||
+          !!settings.net_trace,
       // |args| must be an array; pass a key-value map as the sole client
       // argument.
       args: [{
@@ -407,6 +408,9 @@ module.exports = (config) => {
 
         // Trace MediaSource and media element calls to diagnose a stall.
         mseTrace: !!settings.mse_trace,
+
+        // Trace network requests to find one that never settles.
+        netTrace: !!settings.net_trace,
 
         // Play media at its natural rate instead of 3x.
         noSpeedup: !!settings.no_speedup,

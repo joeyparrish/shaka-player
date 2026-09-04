@@ -14,15 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Reassemble an IndexedDB trace from a test log into a single JSON array.
+"""Reassemble a tracer's output from a test log into a single JSON array.
 
-The tracer installed by test.py --idb-trace reports through the browser
-console, which Karma wraps in quoting and ANSI color and which the tracer
-splits across many CHUNK lines.  This puts the pieces back together.
+The tracers installed by test.py --idb-trace and --net-trace report through
+the browser console, which Karma wraps in quoting and ANSI color and which
+they split across many CHUNK lines.  This puts the pieces back together.
+Both write the same shape, so --prefix chooses which one to read.
 
 Usage:
   build/extract_idb_trace.py <log-file>              # full trace as JSON
   build/extract_idb_trace.py <log-file> --summary    # just the summaries
+  build/extract_idb_trace.py <log-file> --prefix net-trace
 """
 
 import json
@@ -30,9 +32,15 @@ import re
 import sys
 
 
+PREFIX = 'idb-trace'
+if '--prefix' in sys.argv:
+  PREFIX = sys.argv[sys.argv.index('--prefix') + 1]
+
 SESSION = r'([0-9a-z]{4,12}) '
-CHUNK_RE = re.compile(r'\[idb-trace\] CHUNK ' + SESSION + r'(\d+)/(\d+) (\[.*\])')
-SUMMARY_RE = re.compile(r'\[idb-trace\] SUMMARY ' + SESSION + r'(\{.*\})')
+CHUNK_RE = re.compile(
+    r'\[' + re.escape(PREFIX) + r'\] CHUNK ' + SESSION + r'(\d+)/(\d+) (\[.*\])')
+SUMMARY_RE = re.compile(
+    r'\[' + re.escape(PREFIX) + r'\] SUMMARY ' + SESSION + r'(\{.*\})')
 
 
 def strip_tail(text, closer):

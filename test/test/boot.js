@@ -668,6 +668,12 @@ async function setupTestEnvironment() {
     shaka.test.MseTracer.install();
   }
 
+  // Likewise before anything can issue a request, so that the trace covers the
+  // whole run rather than starting partway through it.
+  if (getClientArg('netTrace')) {
+    shaka.test.NetTracer.install();
+  }
+
   const logLevel = getClientArg('logLevel');
   if (logLevel) {
     shaka.log.setLevel(Number(logLevel));
