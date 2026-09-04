@@ -33,18 +33,31 @@ if [ ! -f "$LOG" ]; then
   exit 0
 fi
 
-# Karma prints one TOTAL line per run, so counting them counts the runs that
-# reached an end.  A run that crashes or disconnects prints none, which is why
-# this is compared against the requested count rather than trusted outright.
-total=$(grep -ac "^.*TOTAL:" "$LOG" || true)
-failed=$(grep -ac "^.*TOTAL:.*FAILED" "$LOG" || true)
+# test.py prints its own tally once the whole loop is done, and that is the
+# authoritative one: it counts runs it actually performed.  Its absence is what
+# says a hunt was cut short, since the line is only reached after the last run.
+#
+# Karma's per-run TOTAL lines are the fallback, but they undercount.  Five runs
+# out of sixty produced none in a hunt with IndexedDB tracing on, where the
+# console dumps are large enough to disturb Karma's own summary, and every one
+# of those runs had in fact completed.
+TALLY=$(grep -a "All runs completed" "$LOG" | tail -1 || true)
+
+if [ -n "$TALLY" ]; then
+  passed=$(echo "$TALLY" | sed -E 's|.*completed\. *([0-9]+) */ *([0-9]+).*|\1|')
+  total=$(echo "$TALLY" | sed -E 's|.*completed\. *([0-9]+) */ *([0-9]+).*|\2|')
+  failed=$((total - passed))
+else
+  total=$(grep -ac "^.*TOTAL:" "$LOG" || true)
+  failed=$(grep -ac "^.*TOTAL:.*FAILED" "$LOG" || true)
+fi
 
 echo "=== $LABEL"
 echo "runs_finished=$total"
 echo "runs_failed=$failed"
 
 TRUNCATED=""
-if [ "$EXPECTED" -gt 0 ] && [ "$total" -lt "$EXPECTED" ]; then
+if [ "$EXPECTED" -gt 0 ] && [ -z "$TALLY" ]; then
   TRUNCATED="only $total of $EXPECTED runs finished"
   echo "runs_expected=$EXPECTED"
   echo "::error::Flake hunt truncated: $TRUNCATED.  Any rate from this log is"\
