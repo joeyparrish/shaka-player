@@ -29,14 +29,33 @@ filterDescribe('Storage', checkStorageSupport, () => {
   /** @type {!shaka.test.Waiter} */
   let waiter;
 
-  async function eraseStorage() {
+  // TEMPORARY INSTRUMENTATION, NOT FOR UPSTREAM.  "supports DASH AES-128
+  // download and playback" hangs for its whole two minute timeout on Safari,
+  // in about one run in thirty.  Tracing IndexedDB and the network showed both
+  // finishing their work identically to a passing run, all of it inside the
+  // first tenth of a second, followed by two minutes of complete silence.  So
+  // something here is awaited and never comes back, and this says which.
+  let stepSeq = 0;
+  /** @param {string} label */
+  function step(label) {
+    if (window['dump']) {
+      window['dump']('[step] ' + (++stepSeq) + ' ' + label +
+          ' @' + Math.round(performance.now()));
+    }
+  }
+
+  async function eraseStorage(who) {
     /** @type {!shaka.offline.StorageMuxer} */
     const muxer = new shaka.offline.StorageMuxer();
 
     try {
+      step(who + ' erase: muxer.erase');
       await muxer.erase();
+      step(who + ' erase: muxer.erase done');
     } finally {
+      step(who + ' erase: muxer.destroy');
       await muxer.destroy();
+      step(who + ' erase: muxer.destroy done');
     }
   }
 
@@ -48,13 +67,18 @@ filterDescribe('Storage', checkStorageSupport, () => {
   });
 
   beforeEach(async () => {
+    step('beforeEach start');
     // Make sure we start with a clean slate between each run.
-    await eraseStorage();
+    await eraseStorage('beforeEach');
 
+    step('beforeEach: createManifests');
     await shaka.test.TestScheme.createManifests(compiledShaka, '_compiled');
+    step('beforeEach: createManifests done');
     player = new compiledShaka.Player();
     storage = new compiledShaka.offline.Storage(player);
+    step('beforeEach: attach');
     await player.attach(video);
+    step('beforeEach: attach done');
 
     // Disable stall detection, which can interfere with playback tests.
     player.configure('streaming.stallEnabled', false);
@@ -67,15 +91,21 @@ filterDescribe('Storage', checkStorageSupport, () => {
     onErrorSpy = jasmine.createSpy('onError');
     onErrorSpy.and.callFake((event) => fail(event.detail));
     eventManager.listen(player, 'error', Util.spyFunc(onErrorSpy));
+    step('beforeEach done');
   });
 
   afterEach(async () => {
+    step('afterEach start');
     eventManager.release();
+    step('afterEach: storage.destroy');
     await storage.destroy();
+    step('afterEach: storage.destroy done');
     await player.destroy();
+    step('afterEach: player.destroy done');
 
     // Make sure we don't leave anything behind.
-    await eraseStorage();
+    await eraseStorage('afterEach');
+    step('afterEach done');
   });
 
   afterAll(() => {
@@ -89,21 +119,31 @@ filterDescribe('Storage', checkStorageSupport, () => {
       'downloaded': new Date(),
     };
 
+    step('spec: store');
     const result = await storage.store(url, metadata).promise;
+    step('spec: store done');
 
+    step('spec: load');
     await player.load(result.offlineUri);
+    step('spec: load done');
     await video.play();
+    step('spec: play done');
     expect(player.isLive()).toBe(false);
 
     // Wait for the video to start playback.  If it takes longer than 10
     // seconds, fail the test.
+    step('spec: waitForMovement');
     await waiter.waitForMovementOrFailOnTimeout(video, 10);
+    step('spec: waitForMovement done');
 
     // Play for 2 seconds, but stop early if the video ends.  If it takes
     // longer than 10 seconds, fail the test.
+    step('spec: waitUntilPlayheadReaches');
     await waiter.waitUntilPlayheadReachesOrFailOnTimeout(video, 2, 10);
+    step('spec: waitUntilPlayheadReaches done');
 
     await player.unload();
+    step('spec: unload done');
   });
 
   it('supports HLS AES-256 download and playback', async () => {
