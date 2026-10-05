@@ -259,6 +259,10 @@ function getIdentifierString(node) {
     return node.name;
   }
 
+  if (node.type == 'FunctionExpression') {
+    return '';
+  }
+
   assert.equal(node.type, 'MemberExpression');
   // Example code: foo.bar.baz
   // Example node: {
