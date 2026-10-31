@@ -378,6 +378,7 @@ requirement: {
     "Using \"TextDecoder\" directly is not allowed; "
     "because is not supported on Xbox and old browsers."
   whitelist_regexp: "lib/util/string_utils.js"
+  whitelist_regexp: "lib/util/pssh.js"
 }
 
 requirement: {
